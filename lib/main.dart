@@ -1,4 +1,6 @@
 import 'package:autohub_app/pages/login_page.dart';
+import 'package:autohub_app/pages/ride_completion_page.dart';
+import 'package:autohub_app/pages/map_ride_price_page.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +21,8 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => LoginPage(),
+        '/ride': (context) => RideScreen(),
+        '/feedback': (context) => FeedbackScreen(),
       },
     );
   }
