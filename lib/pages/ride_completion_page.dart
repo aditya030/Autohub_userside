@@ -82,7 +82,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
             SizedBox(height: 10),
             TextField(
               decoration: InputDecoration(
-                hintText: 'Write your feedback',
+                hintText: 'Write your feedback please',
                 border: OutlineInputBorder(),
               ),
               minLines: 3,
