@@ -1,3 +1,4 @@
+import 'package:autohub_app/pages/auto_details_page.dart';
 import 'package:flutter/material.dart';
 import 'package:autohub_app/pages/home_page.dart';
 import 'package:autohub_app/pages/login_page.dart';
@@ -19,14 +20,15 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/homepage',
+      initialRoute: '/Auto_details',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
         '/feedback': (context) => FeedbackScreen(),
         '/homepage': (context) => HomePage(),
         '/searchpage': (context) => SearchPage(),
-        '/ridecompletion': (context) => RideCompletion()
+        '/ridecompletion': (context) => RideCompletion(),
+        '/Auto_details': (context) => BookingPage()
       },
     );
   }
