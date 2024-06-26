@@ -60,21 +60,23 @@ class _LoginPageState extends State<LoginPage> {
                         fontWeight: FontWeight.w400,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     // Spacer(),
                     Container(
                       width: dynamicWidth,
-                      child: TextField(
+                      child: const TextField(
                         decoration: InputDecoration(
                           hintText: "Email Id",
                           border: TextFieldStyle.loginfield,
                           focusedBorder: TextFieldStyle.focussedLoginField,
+                          filled: true,
+                          fillColor: AppColors.backgroundColor,
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     // Spacer(),
@@ -85,10 +87,12 @@ class _LoginPageState extends State<LoginPage> {
                           hintText: "Password",
                           border: TextFieldStyle.loginfield,
                           focusedBorder: TextFieldStyle.focussedLoginField,
+                          filled: true,
+                          fillColor: AppColors.backgroundColor,
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 15,
                     ),
                     Spacer(),
@@ -96,7 +100,9 @@ class _LoginPageState extends State<LoginPage> {
                       width: dynamicWidth,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).pushReplacementNamed("/homepage");
+                        },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
@@ -112,10 +118,10 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 40,
                     ),
-                    Spacer(),
+                    const Spacer(),
                   ],
                 ),
               ),

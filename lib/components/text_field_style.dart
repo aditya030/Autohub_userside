@@ -22,4 +22,14 @@ class TextFieldStyle {
       width: 2.5,
     ),
   );
+
+   static const SearchLocationField = OutlineInputBorder(
+    borderRadius: BorderRadius.all(
+      Radius.circular(25),
+    ),
+    borderSide: BorderSide(
+      color: Colors.white,
+      width: 0.0,
+    ),
+  );
 }
