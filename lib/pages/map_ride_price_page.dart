@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:autohub_app/styles/app_colors.dart';
 
-class RideScreen extends StatelessWidget {
-  final LatLng _center = LatLng(12.9715987, 79.1595439); 
+class MapRidePricePage extends StatefulWidget {
+  const MapRidePricePage({Key? key}) : super(key: key);
 
   @override
+  State<MapRidePricePage> createState() => _MapRidePricePageState();
+}
+
+class _MapRidePricePageState extends State<MapRidePricePage> {
+  @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
           FlutterMap(
@@ -43,88 +54,235 @@ class RideScreen extends StatelessWidget {
             ],
           ),
           Positioned(
-            top: 20,
-            left: 10,
-            right: 10,
-            child: Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      leading: CircleAvatar(backgroundColor: Colors.green),
-                      title: Text('Vit Main Gate'),
+            top: 50.0,
+            left: 15.0,
+            child: Container(
+              width: screenWidth * 0.9,
+              height: 100.0,
+              decoration: BoxDecoration(
+                color: AppColors.backgroundColor.withOpacity(0.9),
+                borderRadius: BorderRadius.all(Radius.circular(5)),
+                border: Border.all(color: AppColors.primaryColor),
+              ),
+              child: Column(
+                children: [
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: "Vit Main Gate",
+                      hintStyle: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.circle,
+                        color: Colors.green,
+                        size: 15,
+                      ),
+                      border: InputBorder.none,
                     ),
-                    ListTile(
-                      leading: CircleAvatar(backgroundColor: Colors.red),
-                      title: Text('Katpadi railway station'),
+                  ),
+                  Divider(
+                    height: 0.0,
+                    color: Colors.black,
+                  ),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: "Katpadi railway station",
+                      hintStyle: TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search_outlined,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                      border: InputBorder.none,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
+          Align(
+            alignment: Alignment.bottomCenter,
             child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.all(16.0),
+              height: screenHeight * 0.40,
+              width: screenWidth,
+              decoration: BoxDecoration(
+                color: AppColors.backgroundColor,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Choose your ride',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  ListTile(
-                    title: Text('Auto'),
-                    subtitle: Text('2-3 person'),
-                    trailing: Text('₹ 120'),
-                  ),
-                  ListTile(
-                    tileColor: Colors.greenAccent,
-                    title: Text('Premium Auto'),
-                    subtitle: Text('4-5 person'),
-                    trailing: Text('₹ 150'),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.money),
-                          label: Text('Cash'),
+                  Padding(
+                    padding: EdgeInsets.only(top: 20, left: 29),
+                    child: SizedBox(
+                      height: screenHeight * 0.055,
+                      width: screenWidth,
+                      child: Text(
+                        "Choose your ride",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      Expanded(
-                        child: TextButton.icon(
-                          onPressed: () {},
-                          icon: Icon(Icons.discount),
-                          label: Text('Promo code'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/feedback');
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Book this auto'),
-                        Text('₹ 150'),
-                      ],
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      padding: EdgeInsets.symmetric(vertical: 15),
+                  ),
+                  Divider(
+                    height: 0,
+                  ),
+                  SizedBox(
+                    height: screenHeight * 0.1,
+                    width: screenWidth,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(0)),
+                        backgroundColor: AppColors.offwhite,
+                      ),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 30),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: screenHeight * 0.025,
+                                ),
+                                Text(
+                                  "Auto",
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryColor),
+                                ),
+                                Text(
+                                  "2-3 Persons",
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppColors.primaryColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Spacer(),
+                          Text(
+                            "₹ 120",
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: screenHeight * 0.1,
+                    width: screenWidth,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(0)),
+                        backgroundColor: Color(0xff70D94C),
+                      ),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 30),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  height: screenHeight * 0.025,
+                                ),
+                                Text(
+                                  "Premium Auto",
+                                  style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryColor),
+                                ),
+                                Text(
+                                  "4-5 Persons",
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: AppColors.primaryColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Spacer(),
+                          Text(
+                            "₹ 150",
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: screenHeight * 0.02,
+                  ),
+                  SizedBox(
+                    width: screenWidth * 0.9,
+                    height: screenHeight * 0.08,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        print("Button Clicked");
+                        Navigator.pushNamed(context, '/ridecompletion');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50)),
+                        backgroundColor: AppColors.primaryColor,
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            "  Book this auto",
+                            style: TextStyle(
+                              color: AppColors.backgroundColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Spacer(),
+                          Text(
+                            "₹ 150",
+                            style: TextStyle(
+                              color: AppColors.backgroundColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          CircleAvatar(
+                            radius: screenWidth * 0.05,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.navigate_next_sharp,
+                              color: Colors.black,
+                              size: 30,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
