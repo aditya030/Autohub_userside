@@ -12,39 +12,30 @@ class RideScreen extends StatelessWidget {
         children: [
           FlutterMap(
             options: MapOptions(
-              center: _center,
-              zoom: 15.0,
-            ),
-            layers: [
-              TileLayerOptions(
-                urlTemplate:
-                    "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                subdomains: ['a', 'b', 'c'],
+              initialCenter: LatLng(
+                12.9692,
+                79.1559,
               ),
-              MarkerLayerOptions(
+              initialZoom: 15,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'dev.vit.vellore',
+              ),
+
+              // Dynamically fetch the users current location
+              // According the latitude and the longitude will be set.
+              MarkerLayer(
                 markers: [
                   Marker(
-                    width: 80.0,
-                    height: 80.0,
-                    point: LatLng(12.9715987, 79.1595439),
-                    builder: (ctx) => Container(
-                      child: Icon(
-                        Icons.location_pin,
-                        color: Colors.green,
-                        size: 40.0,
-                      ),
+                    point: LatLng(
+                      12.9692,
+                      79.1559,
                     ),
-                  ),
-                  Marker(
-                    width: 80.0,
-                    height: 80.0,
-                    point: LatLng(12.9791198, 79.141501),
-                    builder: (ctx) => Container(
-                      child: Icon(
-                        Icons.location_pin,
-                        color: Colors.red,
-                        size: 40.0,
-                      ),
+                    child: Icon(
+                      Icons.location_on,
+                      color: Colors.green,
                     ),
                   ),
                 ],
