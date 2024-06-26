@@ -1,5 +1,7 @@
 import 'package:autohub_app/pages/home_page.dart';
 import 'package:autohub_app/pages/login_page.dart';
+import 'package:autohub_app/pages/ride_completion.dart';
+import 'package:autohub_app/pages/search_page.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +23,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginPage(),
         '/homepage': (content) => HomePage(),
+        '/searchpage': (context) => SearchPage(),
+        '/ridecompletion' : (context) => RideCompletion(),
       },
     );
   }

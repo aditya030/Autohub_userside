@@ -17,6 +17,7 @@ class _HomePageState extends State<HomePage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeigth = MediaQuery.of(context).size.height;
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
@@ -59,14 +60,33 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   width: screenWidth * 0.8,
                   height: 50,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Search Location",
-                      prefixIcon: Icon(Icons.search),
-                      border: TextFieldStyle.SearchLocationField,
-                      // focusedBorder: TextFieldStyle.focussedLoginField,
-                      filled: true,
-                      fillColor: AppColors.backgroundColor,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to search page
+                      Navigator.pushNamed(context, '/searchpage');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.backgroundColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(30), // Adjust border radius
+                        side: BorderSide(
+                          color: AppColors
+                              .primaryColor, // Same color as TextField border
+                        ),
+                      ),
+                      elevation: 0, // Remove elevation to match TextField
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.search, color: Colors.grey),
+                        SizedBox(
+                            width: 10), // Adjust spacing between icon and text
+                        Text(
+                          "Search Location",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -223,10 +243,14 @@ class _HomePageState extends State<HomePage> {
                     width: screenWidth * 0.9,
                     height: screenHeigth * 0.08,
                     child: ElevatedButton(
-                        onPressed: () {print("Button Clicked");},
+                        onPressed: () {
+                          print("Button Clicked");
+                          Navigator.pushNamed(context, '/ridecompletion');
+                        },
                         style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)), backgroundColor: AppColors.primaryColor),
-                            
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50)),
+                            backgroundColor: AppColors.primaryColor),
                         child: Row(
                           children: [
                             Text(
@@ -237,13 +261,17 @@ class _HomePageState extends State<HomePage> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            SizedBox(width: screenWidth * 0.2,),
+                            SizedBox(
+                              width: screenWidth * 0.2,
+                            ),
                             CircleAvatar(
                               radius: screenWidth * 0.05,
                               backgroundColor: Colors.white,
-                              child: Icon(Icons.navigate_next_sharp,
-                              color: Colors.black,
-                              size: 30,),
+                              child: Icon(
+                                Icons.navigate_next_sharp,
+                                color: Colors.black,
+                                size: 30,
+                              ),
                             ),
                           ],
                         )),
