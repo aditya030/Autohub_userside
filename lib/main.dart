@@ -7,6 +7,7 @@ import 'package:autohub_app/pages/ride_completion_page.dart';
 import 'package:autohub_app/pages/map_ride_price_page.dart';
 import 'package:autohub_app/pages/ride_completion.dart';
 import 'package:autohub_app/pages/search_page.dart';
+import 'package:autohub_app/pages/sign_in_page.dart';
 import 'package:autohub_app/pages/user_details_page.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/homeintro',
+      initialRoute: '/signup',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
@@ -35,6 +36,8 @@ class MyApp extends StatelessWidget {
         '/userdetails': (context) => UserDetailsPage(),
          '/driverinfo': (context) => DriverDetailsPage(),
         '/homeintro': (context) => SplashScreen(),
+        '/signup': (context) => SigninPage(),
+
 
       },
     );
