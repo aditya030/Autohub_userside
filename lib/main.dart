@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/ride',
+      initialRoute: '/',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => RideScreen(),
