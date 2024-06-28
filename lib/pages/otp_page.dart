@@ -77,6 +77,7 @@ class _VerificationPageState extends State<VerificationPage> {
             TextButton(
               onPressed: () {
                 // Add logic for resending the code
+                
               },
               child: const Text('Didn\'t receive the code? Re-send code'),
               style: TextButton.styleFrom(
@@ -88,6 +89,8 @@ class _VerificationPageState extends State<VerificationPage> {
             ElevatedButton(
               onPressed: () {
                 // Add logic for verifying the code
+                 Navigator.of(context).pushReplacementNamed("/signup");
+
               },
               child: const Text('Send code'),
               style: ElevatedButton.styleFrom(

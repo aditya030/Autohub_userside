@@ -9,6 +9,7 @@ class DriverListPage extends StatefulWidget {
 
 class _DriverListPageState extends State<DriverListPage> {
   Offset position = Offset(300, 700);
+  int? selectedDriverIndex;
 
   final List<Map<String, dynamic>> drivers = const [
     {'name': 'Driver 1', 'rating': 4.7, 'price': 147, 'image': 'assets/images/user2.png'},
@@ -108,31 +109,46 @@ class _DriverListPageState extends State<DriverListPage> {
                   itemCount: drivers.length,
                   itemBuilder: (context, index) {
                     final driver = drivers[index];
-                    return Column(
-                      children: [
-                        ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: AssetImage(driver['image']),
-                          ),
-                          title: Text(driver['name']),
-                          subtitle: Row(
-                            children: [
-                              Icon(Icons.star, color: Colors.yellow, size: 16),
-                              SizedBox(width: 4),
-                              Text(driver['rating'].toString()),
-                            ],
-                          ),
-                          trailing: Text('₹${driver['price']}'),
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedDriverIndex = index;
+                        });
+                        Navigator.pushNamed(
+                          context,
+                          '/rideconfirmation',
+                          arguments: driver,
+                        );
+                      },
+                      child: Container(
+                        color: selectedDriverIndex == index ? Colors.green.withOpacity(0.5) : Colors.transparent,
+                        child: Column(
+                          children: [
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.grey[200],
+                                backgroundImage: AssetImage(driver['image']),
+                              ),
+                              title: Text(driver['name']),
+                              subtitle: Row(
+                                children: [
+                                  Icon(Icons.star, color: Colors.yellow, size: 16),
+                                  SizedBox(width: 4),
+                                  Text(driver['rating'].toString()),
+                                ],
+                              ),
+                              trailing: Text('₹${driver['price']}'),
+                            ),
+                            if (index < drivers.length - 1)
+                              Divider(
+                                thickness: 2,
+                                color: Colors.grey[300],
+                                indent: 10,
+                                endIndent: 16,
+                              ),
+                          ],
                         ),
-                        if (index < drivers.length - 1)
-                          Divider(
-                            thickness: 2,
-                            color: Colors.grey[300],
-                            indent: 10,
-                            endIndent: 16,
-                          ),
-                      ],
+                      ),
                     );
                   },
                 ),

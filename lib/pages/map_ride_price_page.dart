@@ -243,7 +243,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                     child: ElevatedButton(
                       onPressed: () {
                         print("Button Clicked");
-                        Navigator.pushNamed(context, '/ridecompletion');
+                        Navigator.pushNamed(context, '/bidding');
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(

@@ -64,7 +64,7 @@ class SignupPage extends StatelessWidget {
                 SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () {
-                    // Handle sign up
+                     Navigator.of(context).pushReplacementNamed("/profilecompletion");
                   },
                   child: Text(
                     'Sign Up',

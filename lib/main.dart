@@ -10,6 +10,7 @@ import 'package:autohub_app/pages/otp_page.dart';
 import 'package:autohub_app/pages/map_ride_price_page.dart';
 import 'package:autohub_app/pages/profile_completion_page.dart';
 import 'package:autohub_app/pages/ride_completion.dart';
+import 'package:autohub_app/pages/ride_confirmation_page.dart';
 import 'package:autohub_app/pages/search_page.dart';
 import 'package:autohub_app/pages/sign_in_page.dart';
 import 'package:autohub_app/pages/sign_up_page.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/homepage',
+      initialRoute: '/ride',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
@@ -47,6 +48,8 @@ class MyApp extends StatelessWidget {
          '/profilecompletion': (context) => ProfilePage(),
          '/accountcreation': (context) => AccountCreatedPage(),
          '/destination': (context) => DestinationPage(),
+         '/rideconfirmation': (context) => RideConfirmationPage(),
+         
       },
     );
   }
