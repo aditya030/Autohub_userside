@@ -4,11 +4,11 @@ import 'package:autohub_app/pages/home_intro_page.dart';
 import 'package:autohub_app/pages/home_page.dart';
 import 'package:autohub_app/pages/login_page.dart';
 import 'package:autohub_app/pages/otp_page.dart';
-import 'package:autohub_app/pages/ride_completion_page.dart';
 import 'package:autohub_app/pages/map_ride_price_page.dart';
 import 'package:autohub_app/pages/ride_completion.dart';
 import 'package:autohub_app/pages/search_page.dart';
 import 'package:autohub_app/pages/sign_in_page.dart';
+import 'package:autohub_app/pages/sign_up_page.dart';
 import 'package:autohub_app/pages/user_details_page.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +29,6 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
-        '/feedback': (context) => FeedbackScreen(),
         '/homepage': (context) => HomePage(),
         '/searchpage': (context) => SearchPage(),
         '/ridecompletion': (context) => RideCompletion(),
@@ -37,8 +36,9 @@ class MyApp extends StatelessWidget {
         '/userdetails': (context) => UserDetailsPage(),
          '/driverinfo': (context) => DriverDetailsPage(),
         '/homeintro': (context) => SplashScreen(),
-        '/signup': (context) => SigninPage(),
+        '/signin': (context) => SigninPage(),
         '/otp': (context) => VerificationPage(),
+        '/signup': (context) => SignupPage(),
 
 
       },
