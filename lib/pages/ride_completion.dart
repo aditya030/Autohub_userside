@@ -148,7 +148,7 @@ class _RideCompletionState extends State<RideCompletion> {
             ),
           ),
           SizedBox(
-            height: 12,
+            height: 13,
           ),
           Align(
             alignment: Alignment.topLeft,
