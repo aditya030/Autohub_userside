@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Positioned.fill(
               child: Image.asset(
-                "assets/images/lower_background_doodle.png",
+                "assets/images/full_background_doodle.png",
                 fit: BoxFit.cover,
               ),
             ),
