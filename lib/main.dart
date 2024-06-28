@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/destination',
+      initialRoute: '/ridecompletion',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
@@ -47,8 +47,6 @@ class MyApp extends StatelessWidget {
          '/profilecompletion': (context) => ProfilePage(),
          '/accountcreation': (context) => AccountCreatedPage(),
          '/destination': (context) => DestinationPage(),
-
-
       },
     );
   }

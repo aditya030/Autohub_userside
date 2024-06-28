@@ -45,7 +45,7 @@ class _RideCompletionState extends State<RideCompletion> {
             ),
           ),
           SizedBox(
-            height: 20,
+            height: 16,
           ),
           Padding(
             padding: const EdgeInsets.only(left: 22, right: 30),
@@ -303,11 +303,11 @@ class _RideCompletionState extends State<RideCompletion> {
               ],
             ),
           ),
-          SizedBox(height: 15,),
+          SizedBox(height: 0,),
           Spacer(),
           Container(
             width: screenWidth * 0.85,
-            height: 50,
+            
             child: ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pushReplacementNamed("/homepage");
@@ -327,7 +327,7 @@ class _RideCompletionState extends State<RideCompletion> {
               ),
             ),
           ),
-          SizedBox(height: 40,),
+          SizedBox(height: 8,),
         ],
       ),
     );
