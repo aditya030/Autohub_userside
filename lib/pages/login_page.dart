@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage> {
                       height: 140,
                     ),
                     SizedBox(
-                      height: 30,
+                      height: 25,
                     ),
                     // Spacer(),
                     Text(
@@ -92,8 +92,29 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("Don't have an account?"),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushReplacementNamed("/signin");
+                              },
+                              child: Text(
+                                "Click Here",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  color: AppColors.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )),
+                        ],
+                      ),
+                    ),
                     const SizedBox(
-                      height: 15,
+                      height: 13,
                     ),
                     Spacer(),
                     Container(
@@ -101,7 +122,8 @@ class _LoginPageState extends State<LoginPage> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed("/signin");
+                          Navigator.of(context)
+                              .pushReplacementNamed("/homepage");
                         },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -119,8 +141,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(
-                      height: 40,
-                    ),
+                        // height: 40,
+                        ),
                     const Spacer(),
                   ],
                 ),

@@ -1,12 +1,15 @@
+import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class SigninPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Ensures the UI resizes when the keyboard appears
+      resizeToAvoidBottomInset:
+          true, // Ensures the UI resizes when the keyboard appears
       body: Center(
-        child: SingleChildScrollView( // Makes the content scrollable
+        child: SingleChildScrollView(
+          // Makes the content scrollable
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -36,8 +39,19 @@ class SigninPage extends StatelessWidget {
                   hintText: 'XXXXXXXXXX',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide(
+                      color: AppColors.primaryColor,
+                    ),
                   ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2.0,
+                    ),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                 ),
                 keyboardType: TextInputType.phone,
               ),
@@ -45,15 +59,17 @@ class SigninPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Handle sign up with phone number
-                   Navigator.of(context).pushReplacementNamed("/otp");
+                  Navigator.of(context).pushReplacementNamed("/otp");
                 },
                 child: Text(
                   'Sign up with phone number',
                   style: TextStyle(fontSize: 16),
                 ),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, backgroundColor: Colors.black,
-                  padding: EdgeInsets.symmetric(horizontal: 44.0, vertical: 12.0),
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.black,
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 44.0, vertical: 12.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
@@ -81,8 +97,11 @@ class SigninPage extends StatelessWidget {
                   style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black, backgroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                  
+                  foregroundColor: Colors.black,
+                  backgroundColor: Colors.white,
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 120.0, vertical: 12.0),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     side: BorderSide(color: Colors.grey),
