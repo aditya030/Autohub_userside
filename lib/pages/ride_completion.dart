@@ -1,3 +1,4 @@
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -10,6 +11,7 @@ class RideCompletion extends StatefulWidget {
 }
 
 class _RideCompletionState extends State<RideCompletion> {
+  var _razorpay = Razorpay();
   @override
   Widget build(BuildContext context) {
     double screenHeigth = MediaQuery.of(context).size.height;
@@ -310,7 +312,20 @@ class _RideCompletionState extends State<RideCompletion> {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed("/homepage");
+                // Navigator.of(context).pushReplacementNamed("/homepage");
+                var options = {
+                  'key': 'rzp_test_4ZtM3uCcmSeeED',
+                  'amount': 135*100, //in the smallest currency sub-unit.
+                  'name': 'Autohub',
+                  // 'order_id': 'order_EMBFqjDHEEn80l', // Generate order_id using Orders API
+                  'description': 'This is your total amount for the ride.',
+                  'timeout': 300, // in seconds
+                  'prefill': {
+                    'contact': '7524011662',
+                    'email': 'samarthverma1813@gmail.com'
+                  }
+                };
+                  _razorpay.open(options);
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
@@ -319,7 +334,7 @@ class _RideCompletionState extends State<RideCompletion> {
                 backgroundColor: AppColors.primaryColor,
               ),
               child: Text(
-                "Complete",
+                "Payment",
                 style: TextStyle(
                   fontSize: 16,
                   color: AppColors.backgroundColor,
@@ -332,4 +347,32 @@ class _RideCompletionState extends State<RideCompletion> {
       ),
     );
   }
+  @override
+  void initState() {
+    // TODO: implement dispose      
+    super.initState();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+  
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _razorpay.clear(); // Removes all listeners
+    super.dispose();
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Do something when payment succeeds
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet is selected
+  }
+
 }
