@@ -262,7 +262,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             SizedBox(
-                              width: screenWidth * 0.1,
+                              width: screenWidth * 0.2,
                             ),
                             CircleAvatar(
                               radius: screenWidth * 0.05,
