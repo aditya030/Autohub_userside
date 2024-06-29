@@ -94,7 +94,7 @@ class SigninPage extends StatelessWidget {
                 icon: Image.asset('assets/images/google_logo.png', height: 24),
                 label: Text(
                   'Google',
-                  style: TextStyle(fontSize: 16, color: Colors.black),
+                  style: TextStyle(fontSize: 10, color: Colors.black),
                 ),
                 style: ElevatedButton.styleFrom(
                   

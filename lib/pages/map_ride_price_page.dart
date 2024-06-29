@@ -254,7 +254,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                       child: Row(
                         children: [
                           Text(
-                            "Place your offer price",
+                            "Place your offer of",
                             style: TextStyle(
                               color: AppColors.backgroundColor,
                               fontSize: 18,

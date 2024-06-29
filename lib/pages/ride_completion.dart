@@ -46,9 +46,7 @@ class _RideCompletionState extends State<RideCompletion> {
               ),
             ),
           ),
-          SizedBox(
-            height: 16,
-          ),
+          
           Padding(
             padding: const EdgeInsets.only(left: 22, right: 30),
             child: Row(
@@ -305,7 +303,7 @@ class _RideCompletionState extends State<RideCompletion> {
               ],
             ),
           ),
-          SizedBox(height: 20,),
+          SizedBox(height: 16,),
           Spacer(),
           Container(
             width: screenWidth * 0.85,
@@ -342,7 +340,7 @@ class _RideCompletionState extends State<RideCompletion> {
               ),
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 4),
         ],
       ),
     );
