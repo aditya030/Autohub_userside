@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Positioned.fill(
               child: Image.asset(
-                "assets/images/lower_background_doodle.png",
+                "assets/images/full_background_doodle.png",
                 fit: BoxFit.cover,
               ),
             ),
@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).pushReplacementNamed("/homepage");
+                          Navigator.of(context).pushReplacementNamed("/signin");
                         },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(

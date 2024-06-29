@@ -11,6 +11,8 @@ class MapRidePricePage extends StatefulWidget {
 }
 
 class _MapRidePricePageState extends State<MapRidePricePage> {
+  bool isPremiumSelected = true;
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -23,10 +25,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
         children: [
           FlutterMap(
             options: MapOptions(
-              initialCenter: LatLng(
-                12.9692,
-                79.1559,
-              ),
+              initialCenter: LatLng(12.9692, 79.1559),
               initialZoom: 15,
             ),
             children: [
@@ -34,16 +33,10 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'dev.vit.vellore',
               ),
-
-              // Dynamically fetch the users current location
-              // According the latitude and the longitude will be set.
               MarkerLayer(
                 markers: [
                   Marker(
-                    point: LatLng(
-                      12.9692,
-                      79.1559,
-                    ),
+                    point: LatLng(12.9692, 79.1559),
                     child: Icon(
                       Icons.location_on,
                       color: Colors.green,
@@ -81,10 +74,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                       border: InputBorder.none,
                     ),
                   ),
-                  Divider(
-                    height: 0.0,
-                    color: Colors.black,
-                  ),
+                  Divider(height: 0.0, color: Colors.black),
                   TextField(
                     decoration: InputDecoration(
                       hintText: "Katpadi railway station",
@@ -133,18 +123,23 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                       ),
                     ),
                   ),
-                  Divider(
-                    height: 0,
-                  ),
+                  Divider(height: 0),
                   SizedBox(
                     height: screenHeight * 0.1,
                     width: screenWidth,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          isPremiumSelected = false;
+                        });
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0)),
-                        backgroundColor: AppColors.offwhite,
+                          borderRadius: BorderRadius.circular(0),
+                        ),
+                        backgroundColor: isPremiumSelected
+                            ? AppColors.offwhite
+                            : Color(0xff70D94C),
                       ),
                       child: Row(
                         children: [
@@ -153,21 +148,21 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(
-                                  height: screenHeight * 0.025,
-                                ),
+                                SizedBox(height: screenHeight * 0.025),
                                 Text(
                                   "Auto",
                                   style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryColor),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryColor,
+                                  ),
                                 ),
                                 Text(
                                   "2-3 Persons",
                                   style: TextStyle(
-                                      fontSize: 10,
-                                      color: AppColors.primaryColor),
+                                    fontSize: 10,
+                                    color: AppColors.primaryColor,
+                                  ),
                                 ),
                               ],
                             ),
@@ -189,11 +184,18 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                     height: screenHeight * 0.1,
                     width: screenWidth,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          isPremiumSelected = true;
+                        });
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0)),
-                        backgroundColor: Color(0xff70D94C),
+                          borderRadius: BorderRadius.circular(0),
+                        ),
+                        backgroundColor: isPremiumSelected
+                            ? Color(0xff70D94C)
+                            : AppColors.offwhite,
                       ),
                       child: Row(
                         children: [
@@ -202,21 +204,21 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(
-                                  height: screenHeight * 0.025,
-                                ),
+                                SizedBox(height: screenHeight * 0.025),
                                 Text(
                                   "Premium Auto",
                                   style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryColor),
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primaryColor,
+                                  ),
                                 ),
                                 Text(
                                   "4-5 Persons",
                                   style: TextStyle(
-                                      fontSize: 10,
-                                      color: AppColors.primaryColor),
+                                    fontSize: 10,
+                                    color: AppColors.primaryColor,
+                                  ),
                                 ),
                               ],
                             ),
@@ -234,20 +236,19 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: screenHeight * 0.02,
-                  ),
+                  SizedBox(height: screenHeight * 0.02),
                   SizedBox(
                     width: screenWidth * 0.9,
                     height: screenHeight * 0.08,
                     child: ElevatedButton(
                       onPressed: () {
                         print("Button Clicked");
-                        Navigator.pushNamed(context, '/ridecompletion');
+                        Navigator.pushNamed(context, '/bidding');
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50)),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
                         backgroundColor: AppColors.primaryColor,
                       ),
                       child: Row(
@@ -262,16 +263,14 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                           ),
                           Spacer(),
                           Text(
-                            "₹ 150",
+                            isPremiumSelected ? "₹ 150" : "₹ 120",
                             style: TextStyle(
                               color: AppColors.backgroundColor,
                               fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(
-                            width: 10,
-                          ),
+                          SizedBox(width: 10),
                           CircleAvatar(
                             radius: screenWidth * 0.05,
                             backgroundColor: Colors.white,

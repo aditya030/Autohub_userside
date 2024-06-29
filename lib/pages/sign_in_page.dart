@@ -45,6 +45,7 @@ class SigninPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Handle sign up with phone number
+                   Navigator.of(context).pushReplacementNamed("/otp");
                 },
                 child: Text(
                   'Sign up with phone number',
