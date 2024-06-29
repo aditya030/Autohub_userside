@@ -14,6 +14,7 @@ import 'package:autohub_app/pages/ride_confirmation_page.dart';
 import 'package:autohub_app/pages/search_page.dart';
 import 'package:autohub_app/pages/sign_in_page.dart';
 import 'package:autohub_app/pages/sign_up_page.dart';
+import 'package:autohub_app/pages/user_bid_page.dart';
 import 'package:autohub_app/pages/user_details_page.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/',
+      initialRoute: '/homepage',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
@@ -39,17 +40,17 @@ class MyApp extends StatelessWidget {
         '/ridecompletion': (context) => RideCompletion(),
         '/Auto_details': (context) => BookingPage(),
         '/userdetails': (context) => UserDetailsPage(),
-         '/driverinfo': (context) => DriverDetailsPage(),
+        '/driverinfo': (context) => DriverDetailsPage(),
         '/homeintro': (context) => SplashScreen(),
         '/signin': (context) => SigninPage(),
         '/otp': (context) => VerificationPage(),
         '/signup': (context) => SignupPage(),
-         '/bidding': (context) => DriverListPage(),
-         '/profilecompletion': (context) => ProfilePage(),
-         '/accountcreation': (context) => AccountCreatedPage(),
-         '/destination': (context) => DestinationPage(),
-         '/rideconfirmation': (context) => RideConfirmationPage(),
-         
+        '/bidding': (context) => DriverListPage(),
+        '/profilecompletion': (context) => ProfilePage(),
+        '/accountcreation': (context) => AccountCreatedPage(),
+        '/destination': (context) => DestinationPage(),
+        '/rideconfirmation': (context) => RideConfirmationPage(),
+        '/userbidpage': (context) => UserBidPage(),
       },
     );
   }

@@ -243,7 +243,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                     child: ElevatedButton(
                       onPressed: () {
                         print("Button Clicked");
-                        Navigator.pushNamed(context, '/bidding');
+                        Navigator.pushNamed(context, '/userbidpage');
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -254,7 +254,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                       child: Row(
                         children: [
                           Text(
-                            "  Book this auto",
+                            "Place your offer price",
                             style: TextStyle(
                               color: AppColors.backgroundColor,
                               fontSize: 18,

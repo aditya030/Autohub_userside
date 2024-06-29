@@ -248,9 +248,13 @@ class _BookingPageState extends State<BookingPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: SizedBox(
                       width: screenWidth * 1.2,
+                      height: 50,
                       child: ElevatedButton(
                         onPressed: () {
                           // Cancel booking action
+
+                          // For now added the ride completion page.
+                          Navigator.of(context).pushReplacementNamed("/ridecompletion");
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
@@ -276,7 +280,7 @@ class _BookingPageState extends State<BookingPage> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 18),
+                  SizedBox(height: 28),
                 ],
               ),
             ),
