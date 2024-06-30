@@ -21,7 +21,7 @@ class _RideCompletionState extends State<RideCompletion> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 70, left: 22, right: 30),
+            padding: const EdgeInsets.only(top: 50, left: 22, right: 30,bottom: 6),
             child: Align(
               alignment: Alignment.topLeft,
               child: RichText(
@@ -67,7 +67,7 @@ class _RideCompletionState extends State<RideCompletion> {
                   ),
                 ),
                 SizedBox(
-                  width: 15,
+                  width: 10,
                 ),
                 Spacer(),
                 Icon(
@@ -87,7 +87,7 @@ class _RideCompletionState extends State<RideCompletion> {
             ),
           ),
           SizedBox(
-            height: 30,
+            height: 20,
           ),
           Text(
             "How was your trip?",
@@ -115,7 +115,7 @@ class _RideCompletionState extends State<RideCompletion> {
             },
           ),
           SizedBox(
-            height: 30,
+            height: 25,
           ),
           SizedBox(
             width: screenWidth * 0.7, // Set the desired width
@@ -133,7 +133,7 @@ class _RideCompletionState extends State<RideCompletion> {
               ),
             ),
           ),
-          Spacer(),
+          // Spacer(),
           Padding(
             padding: const EdgeInsets.only(left: 22, right: 30),
             child: Align(
@@ -148,7 +148,7 @@ class _RideCompletionState extends State<RideCompletion> {
             ),
           ),
           SizedBox(
-            height: 13,
+            height: 7,
           ),
           Align(
             alignment: Alignment.topLeft,
@@ -214,7 +214,7 @@ class _RideCompletionState extends State<RideCompletion> {
             ),
           ),
           SizedBox(
-            height: 10,
+            height: 2,
           ),
           Spacer(),
           Padding(
@@ -340,7 +340,7 @@ class _RideCompletionState extends State<RideCompletion> {
               ),
             ),
           ),
-          SizedBox(height: 4),
+          SizedBox(height: 23),
         ],
       ),
     );
