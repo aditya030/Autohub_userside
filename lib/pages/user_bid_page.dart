@@ -86,8 +86,21 @@ class _UserBidPageState extends State<UserBidPage> {
                         ),
                       ),
                     ),
+                    SizedBox(height: 10,),
+                    Container(
+                      width: screenWidth * 0.8,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: screenWidth * 0.05),
+                        child: Row(
+                          children: [
+                            Text("Mini Price: Rs 100\t\t\t"),
+                            Text("Max Price: Rs 300")
+                          ],
+                        ),
+                      ),
+                    ),
                     SizedBox(
-                      height: 30,
+                      height: 20,
                     ),
                     Container(
                       width: screenWidth * 0.8,
