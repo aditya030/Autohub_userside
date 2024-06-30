@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class DriverListPage extends StatefulWidget {
@@ -10,6 +11,8 @@ class DriverListPage extends StatefulWidget {
 class _DriverListPageState extends State<DriverListPage> {
   Offset position = Offset(300, 700);
   int? selectedDriverIndex;
+  Timer? _timer;
+  int _seconds = 45;
 
   final List<Map<String, dynamic>> drivers = const [
     {'name': 'Driver 1', 'rating': 4.7, 'price': 147, 'image': 'assets/images/user2.png'},
@@ -27,6 +30,30 @@ class _DriverListPageState extends State<DriverListPage> {
     {'name': 'Driver 14', 'rating': 3.9, 'price': 128, 'image': 'assets/images/user2.png'},
     {'name': 'Driver 15', 'rating': 4.8, 'price': 170, 'image': 'assets/images/user2.png'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  void startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_seconds > 0) {
+        setState(() {
+          _seconds--;
+        });
+      } else {
+        _timer?.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +209,7 @@ class _DriverListPageState extends State<DriverListPage> {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.green.withOpacity(0.5),
             spreadRadius: 1,
             blurRadius: 2,
             offset: Offset(0, 3),
@@ -190,7 +217,7 @@ class _DriverListPageState extends State<DriverListPage> {
         ],
       ),
       child: Text(
-        '00:45',
+        '00:${_seconds.toString().padLeft(2, '0')}',
         style: TextStyle(
           color: Colors.green,
           fontWeight: FontWeight.bold,
