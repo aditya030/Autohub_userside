@@ -1,6 +1,6 @@
-//const mongoose = require('mongoose');
-//
-//const UserSchema = new mongoose.Schema({
+// const mongoose = require('mongoose');
+
+// const UserSchema = new mongoose.Schema({
 //  phoneNumber: {
 //    type: String,
 //    required: true,
@@ -18,10 +18,10 @@
 //    default: false
 //  }
 //  // Add other user-related fields here
-//});
-//
-//module.exports = mongoose.model('User', UserSchema);
-//
+// });
+
+// module.exports = mongoose.model('User', UserSchema);
 
 
-//aditya
+
+// aditya

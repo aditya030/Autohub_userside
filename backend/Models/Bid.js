@@ -1,6 +1,6 @@
-//const mongoose = require('mongoose');
-//
-//const BidSchema = new mongoose.Schema({
+// const mongoose = require('mongoose');
+
+// const BidSchema = new mongoose.Schema({
 //  userId: {
 //    type: mongoose.Schema.Types.ObjectId,
 //    ref: 'User',
@@ -21,9 +21,9 @@
 //    default: 'pending'
 //  }
 //  // Add other bid-related fields here
-//});
-//
-//module.exports = mongoose.model('Bid', BidSchema);
+// });
+
+// module.exports = mongoose.model('Bid', BidSchema);
 
 
-//shailza
+// shailza

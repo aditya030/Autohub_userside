@@ -1,6 +1,6 @@
-//const mongoose = require('mongoose');
-//
-//const RideSchema = new mongoose.Schema({
+// const mongoose = require('mongoose');
+
+// const RideSchema = new mongoose.Schema({
 //  userId: {
 //    type: mongoose.Schema.Types.ObjectId,
 //    ref: 'User',
@@ -20,9 +20,9 @@
 //    default: 'created'
 //  }
 //  // Add other ride-related fields here
-//});
-//
-//module.exports = mongoose.model('Ride', RideSchema);
+// });
+
+// module.exports = mongoose.model('Ride', RideSchema);
 
 
-//samarth
+// samarth
