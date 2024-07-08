@@ -3,6 +3,8 @@ import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +15,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isPremiumSelected = true;
-
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -24,29 +25,29 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
-          FlutterMap(
-            options: MapOptions(
-              initialCenter: LatLng(12.9692, 79.1559),
-              initialZoom: 15,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'dev.vit.vellore',
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: LatLng(12.9692, 79.1559),
-                    child: Icon(
-                      Icons.location_on,
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          // FlutterMap(
+          //   options: MapOptions(
+          //     initialCenter: LatLng(12.9692, 79.1559),
+          //     initialZoom: 15,
+          //   ),
+          //   children: [
+          //     TileLayer(
+          //       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          //       userAgentPackageName: 'dev.vit.vellore',
+          //     ),
+          //     MarkerLayer(
+          //       markers: [
+          //         Marker(
+          //           point: LatLng(12.9692, 79.1559),
+          //           child: Icon(
+          //             Icons.location_on,
+          //             color: Colors.green,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ],
+          // ),
           Padding(
             padding: const EdgeInsets.only(top: 50, left: 10),
             child: Row(

@@ -1,3 +1,4 @@
+import 'package:autohub_app/pages/sample_maps.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:autohub_app/pages/account_created_page.dart';
 import 'package:autohub_app/pages/auto_details_page.dart';
@@ -19,6 +20,7 @@ import 'package:autohub_app/pages/user_bid_page.dart';
 import 'package:autohub_app/pages/user_details_page.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() {
   runApp(MyApp());
@@ -32,7 +34,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/userbidpage',
+      initialRoute: '/samplemap',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
@@ -52,6 +54,7 @@ class MyApp extends StatelessWidget {
         '/destination': (context) => DestinationPage(),
         '/rideconfirmation': (context) => RideConfirmationPage(),
         '/userbidpage': (context) => UserBidPage(),
+        '/samplemap': (context) => SampleMaps(),
       },
     );
   }

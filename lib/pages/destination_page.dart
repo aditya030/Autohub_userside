@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class DestinationPage extends StatelessWidget {
-  final List<Location> locations = [
-    Location('Chennai International Airport', 'Airport Rd, Meenambakkam, Chennai, Tamil Na..'),
-    Location('Airport Departures Terminal Link', 'Meenambakkam, Chennai, Tamil Nadu'),
-    Location('The Park Chennai', '601, Anna Salai, near US Embassy, Gangal Karai..'),
-    Location('Chennai domestic airport', 'X5M7+2HV, Airport Departures Terminal Link, M..'),
+  final List<Places> locations = [
+    Places('Chennai International Airport', 'Airport Rd, Meenambakkam, Chennai, Tamil Na..'),
+    Places('Airport Departures Terminal Link', 'Meenambakkam, Chennai, Tamil Nadu'),
+    Places('The Park Chennai', '601, Anna Salai, near US Embassy, Gangal Karai..'),
+    Places('Chennai domestic airport', 'X5M7+2HV, Airport Departures Terminal Link, M..'),
   ];
 
   @override
@@ -121,9 +121,9 @@ class DestinationPage extends StatelessWidget {
   }
 }
 
-class Location {
+class Places {
   final String name;
   final String address;
 
-  Location(this.name, this.address);
+  Places(this.name, this.address);
 }
