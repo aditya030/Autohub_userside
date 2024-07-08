@@ -1,10 +1,11 @@
+import 'dart:async';
+import 'package:autohub_app/components/const.dart';
 import 'package:autohub_app/components/text_field_style.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:location/location.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +16,31 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool isPremiumSelected = true;
+
+  // Static constant data
+  static LatLng _pSource = LatLng(12.9692, 79.1559);
+  static LatLng _pDestination = LatLng(12.9244, 79.1353);
+
+  final Completer<GoogleMapController> _mapController =
+      Completer<GoogleMapController>();
+
+  LatLng? _pCurrentLocation = null;
+
+  late GoogleMapController mapController;
+  Map<PolylineId, Polyline> polylines = {};
+  List<LatLng> polylinesCoordinates = [];
+  Location _locationController = Location();
+
+  void initState() {
+    super.initState();
+    getLocationupdates().then((_) => {
+          getPolylinePoints().then((coordinates) => {
+                // print(coordinates),
+                generatePolylinesFromPoints(coordinates),
+              }),
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -25,29 +51,38 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
-          // FlutterMap(
-          //   options: MapOptions(
-          //     initialCenter: LatLng(12.9692, 79.1559),
-          //     initialZoom: 15,
-          //   ),
-          //   children: [
-          //     TileLayer(
-          //       urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          //       userAgentPackageName: 'dev.vit.vellore',
-          //     ),
-          //     MarkerLayer(
-          //       markers: [
-          //         Marker(
-          //           point: LatLng(12.9692, 79.1559),
-          //           child: Icon(
-          //             Icons.location_on,
-          //             color: Colors.green,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ],
-          // ),
+          _pCurrentLocation == null
+              ? const Center(
+                  child: Text(
+                    "Loading...",
+                    style: TextStyle(
+                      color: AppColors.primaryColor,
+                      fontSize: 20,
+                    ),
+                  ),
+                )
+              : GoogleMap(
+                  onMapCreated: ((GoogleMapController controller) =>
+                      _mapController.complete(controller)),
+                  mapType: MapType.normal,
+                  initialCameraPosition:
+                      CameraPosition(target: _pSource, zoom: 13),
+                  markers: {
+                    Marker(
+                        markerId: MarkerId("_currentLocation"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                        position: _pCurrentLocation!),
+                    Marker(
+                        markerId: MarkerId("_sourceLocation"),
+                        icon: BitmapDescriptor.defaultMarker,
+                        position: _pSource),
+                    Marker(
+                        markerId: MarkerId("_destionationLocation"),
+                        icon: BitmapDescriptor.defaultMarker,
+                        position: _pDestination),
+                  },
+                  polylines: Set<Polyline>.of(polylines.values),
+                ),
           Padding(
             padding: const EdgeInsets.only(top: 50, left: 10),
             child: Row(
@@ -256,5 +291,79 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
+  Future<void> _cameraToPosition(LatLng pos) async {
+    final GoogleMapController controller = await _mapController.future;
+    CameraPosition _newCameraPosition = CameraPosition(target: pos, zoom: 18);
+    await controller.animateCamera(
+      CameraUpdate.newCameraPosition(_newCameraPosition),
+    );
+  }
+
+  Future<void> getLocationupdates() async {
+    bool _serviceEnabled;
+    PermissionStatus _locationPermissionGranted;
+
+    // If Location is disabled send a prompt saying to turn on the location.
+    _serviceEnabled = await _locationController.serviceEnabled();
+    if (_serviceEnabled) {
+      _serviceEnabled = await _locationController.requestService();
+    } else {
+      return;
+    }
+
+    _locationPermissionGranted = await _locationController.hasPermission();
+    if (_locationPermissionGranted == PermissionStatus.denied) {
+      _locationPermissionGranted =
+          await _locationController.requestPermission();
+      if (_locationPermissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _locationController.onLocationChanged
+        .listen((LocationData currentLocation) {
+      if (currentLocation.latitude != null &&
+          currentLocation.longitude != null) {
+        setState(() {
+          _pCurrentLocation =
+              LatLng(currentLocation.latitude!, currentLocation.longitude!);
+          _cameraToPosition(_pCurrentLocation!);
+          print("Current Position: $currentLocation");
+        });
+      }
+    });
+  }
+
+  Future<List<LatLng>> getPolylinePoints() async {
+    List<LatLng> polylineCoordinates = [];
+    PolylinePoints polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+        googleApiKey: GoogleApiKey,
+        request: PolylineRequest(
+            origin: PointLatLng(_pSource.latitude, _pSource.longitude),
+            destination:
+                PointLatLng(_pDestination.latitude, _pDestination.longitude),
+            mode: TravelMode.driving));
+    if (result.points.isNotEmpty) {
+      result.points.forEach((PointLatLng point) {
+        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+      });
+    } else {
+      print(result.errorMessage);
+    }
+    return polylineCoordinates;
+  }
+
+  void generatePolylinesFromPoints(List<LatLng> polylinesCoordinates) async {
+    PolylineId id = PolylineId("poly");
+    Polyline polyline = Polyline(
+        polylineId: id,
+        color: Colors.green,
+        points: polylinesCoordinates,
+        width: 5);
+    setState(() {
+      polylines[id] = polyline;
+    });
+  }
+}
