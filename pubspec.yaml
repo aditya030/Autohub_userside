@@ -40,14 +40,14 @@ dependencies:
   latlong2: ^0.9.1
   flutter_rating_bar: ^4.0.1
   flutter_svg: ^2.0.10+1
-<<<<<<< HEAD
+
   google_maps_flutter: ^2.7.0
   location: ^7.0.0
   geolocator: ^12.0.0
-=======
+
   firebase_core: ^3.1.1
   firebase_auth: ^5.1.1
->>>>>>> 0a8e841 (connected the project to firebase added required files and otp verification dynmaically)
+
 
 dev_dependencies:
   flutter_test:
