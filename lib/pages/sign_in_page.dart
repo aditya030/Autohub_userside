@@ -17,7 +17,7 @@ class _SigninPageState extends State<SigninPage> {
         phoneNumber: '+91 $_phoneNumber',
         timeout: Duration(seconds: 60),
         verificationCompleted: (PhoneAuthCredential credential) async {
-          // Automatic verification or instant validation.
+          
           await _auth.signInWithCredential(credential);
           Navigator.of(context).pushReplacementNamed("/otp");
         },
@@ -25,17 +25,17 @@ class _SigninPageState extends State<SigninPage> {
           if (e.code == 'invalid-phone-number') {
             print('The provided phone number is not valid.');
           }
-          // Handle other errors
+         
         },
         codeSent: (String verificationId, int? resendToken) {
-          // Navigate to OTP verification page
+    
           Navigator.of(context).pushReplacementNamed(
             '/otp',
             arguments: verificationId,
           );
         },
         codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle timeout
+          
         },
       );
     } catch (e) {

@@ -1,12 +1,10 @@
-<<<<<<< HEAD
+
 import 'package:autohub_app/pages/sample_maps.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-=======
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart'; 
 import 'package:autohub_app/firebase_options.dart';
 import 'package:autohub_app/styles/app_colors.dart';
->>>>>>> 0a8e841 (connected the project to firebase added required files and otp verification dynmaically)
 import 'package:autohub_app/pages/account_created_page.dart';
 import 'package:autohub_app/pages/auto_details_page.dart';
 import 'package:autohub_app/pages/bidding_page.dart';
@@ -25,12 +23,10 @@ import 'package:autohub_app/pages/sign_in_page.dart';
 import 'package:autohub_app/pages/sign_up_page.dart';
 import 'package:autohub_app/pages/user_bid_page.dart';
 import 'package:autohub_app/pages/user_details_page.dart';
-<<<<<<< HEAD
+
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-=======
->>>>>>> 0a8e841 (connected the project to firebase added required files and otp verification dynmaically)
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
