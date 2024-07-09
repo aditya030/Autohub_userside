@@ -1,12 +1,24 @@
 buildscript {
+<<<<<<< HEAD
     ext.kotlin_version = '1.9.0'
+=======
+    ext.kotlin_version = '1.6.10'
+>>>>>>> 0a8e841 (connected the project to firebase added required files and otp verification dynmaically)
     repositories {
         google()
         mavenCentral()
     }
+<<<<<<< HEAD
     dependencies {
         classpath 'com.android.tools.build:gradle:8.5.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+=======
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.3.13'
+>>>>>>> 0a8e841 (connected the project to firebase added required files and otp verification dynmaically)
     }
 }
 
@@ -17,11 +29,20 @@ allprojects {
     }
 }
 
+<<<<<<< HEAD
 rootProject.buildDir = "../build"
 
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
     project.evaluationDependsOn(":app")
+=======
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+>>>>>>> 0a8e841 (connected the project to firebase added required files and otp verification dynmaically)
 }
 
 tasks.register("clean", Delete) {

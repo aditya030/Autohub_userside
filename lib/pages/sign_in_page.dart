@@ -1,15 +1,54 @@
-import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:autohub_app/styles/app_colors.dart';
 
-class SigninPage extends StatelessWidget {
+class SigninPage extends StatefulWidget {
+  @override
+  _SigninPageState createState() => _SigninPageState();
+}
+
+class _SigninPageState extends State<SigninPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late String _phoneNumber;
+
+  Future<void> _verifyPhoneNumber() async {
+    try {
+      await _auth.verifyPhoneNumber(
+        phoneNumber: '+91 $_phoneNumber',
+        timeout: Duration(seconds: 60),
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Automatic verification or instant validation.
+          await _auth.signInWithCredential(credential);
+          Navigator.of(context).pushReplacementNamed("/otp");
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          if (e.code == 'invalid-phone-number') {
+            print('The provided phone number is not valid.');
+          }
+          // Handle other errors
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          // Navigate to OTP verification page
+          Navigator.of(context).pushReplacementNamed(
+            '/otp',
+            arguments: verificationId,
+          );
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          // Handle timeout
+        },
+      );
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset:
-          true, // Ensures the UI resizes when the keyboard appears
+      resizeToAvoidBottomInset: true,
       body: Center(
         child: SingleChildScrollView(
-          // Makes the content scrollable
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -54,13 +93,13 @@ class SigninPage extends StatelessWidget {
                       EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                 ),
                 keyboardType: TextInputType.phone,
+                onChanged: (value) {
+                  _phoneNumber = value;
+                },
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // Handle sign up with phone number
-                  Navigator.of(context).pushReplacementNamed("/otp");
-                },
+                onPressed: _verifyPhoneNumber,
                 child: Text(
                   'Sign up with phone number',
                   style: TextStyle(fontSize: 16),
@@ -75,6 +114,7 @@ class SigninPage extends StatelessWidget {
                   ),
                 ),
               ),
+              // Other UI components
               SizedBox(height: 20),
               Row(
                 children: [
@@ -97,7 +137,6 @@ class SigninPage extends StatelessWidget {
                   style: TextStyle(fontSize: 10, color: Colors.black),
                 ),
                 style: ElevatedButton.styleFrom(
-                  
                   foregroundColor: Colors.black,
                   backgroundColor: Colors.white,
                   padding:

@@ -3,7 +3,12 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+<<<<<<< HEAD
   geolocator_windows
+=======
+  firebase_auth
+  firebase_core
+>>>>>>> 0a8e841 (connected the project to firebase added required files and otp verification dynmaically)
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

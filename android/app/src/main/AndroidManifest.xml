@@ -1,7 +1,12 @@
+<<<<<<< HEAD
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+=======
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.autohub_app">
+>>>>>>> 0a8e841 (connected the project to firebase added required files and otp verification dynmaically)
     <application
         android:label="autohub_app"
         android:name="${applicationName}"
