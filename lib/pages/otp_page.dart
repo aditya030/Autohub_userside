@@ -34,7 +34,7 @@ class _OTPPageState extends State<OTPPage> {
 
       if (userCredential.user != null) {
        
-        Navigator.of(context).pushReplacementNamed('/homepage');
+        Navigator.of(context).pushReplacementNamed('/signup');
       } else {
        
         ScaffoldMessenger.of(context).showSnackBar(
