@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "608641677870",
+    "project_id": "autohub-837d4",
+    "storage_bucket": "autohub-837d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:608641677870:android:96daebcebeb237f663bdbf",
+        "android_client_info": {
+          "package_name": "com.example.autohub_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgKsgd3chx4kM7XXSB3SALU8PWzSiXQZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

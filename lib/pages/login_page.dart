@@ -1,6 +1,7 @@
 import 'package:autohub_app/components/text_field_style.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,6 +11,40 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _auth = FirebaseAuth.instance;
+
+  void _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    try {
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      Navigator.of(context).pushReplacementNamed("/homepage");
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided.');
+      } else {
+        print(e.message);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -33,9 +68,6 @@ class _LoginPageState extends State<LoginPage> {
               child: Center(
                 child: Column(
                   children: [
-                    // SizedBox(
-                    //   height: 60,
-                    // ),
                     Spacer(),
                     Image.asset(
                       "assets/icons/autohub_logo.png",
@@ -45,7 +77,6 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(
                       height: 25,
                     ),
-                    // Spacer(),
                     Text(
                       "Login to your Account",
                       style: TextStyle(
@@ -63,11 +94,11 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(
                       height: 15,
                     ),
-                    // Spacer(),
                     Container(
                       width: dynamicWidth,
-                      child: const TextField(
-                        decoration: InputDecoration(
+                      child: TextField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(
                           hintText: "Email Id",
                           border: TextFieldStyle.loginfield,
                           focusedBorder: TextFieldStyle.focussedLoginField,
@@ -79,17 +110,18 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(
                       height: 15,
                     ),
-                    // Spacer(),
                     Container(
                       width: dynamicWidth,
                       child: TextField(
-                        decoration: InputDecoration(
+                        controller: _passwordController,
+                        decoration: const InputDecoration(
                           hintText: "Password",
                           border: TextFieldStyle.loginfield,
                           focusedBorder: TextFieldStyle.focussedLoginField,
                           filled: true,
                           fillColor: AppColors.backgroundColor,
                         ),
+                        obscureText: true,
                       ),
                     ),
                     Center(
@@ -98,18 +130,19 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           Text("Don't have an account?"),
                           TextButton(
-                              onPressed: () {
-                                Navigator.of(context)
-                                    .pushReplacementNamed("/signin");
-                              },
-                              child: Text(
-                                "Click Here",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: AppColors.primaryColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              )),
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pushReplacementNamed("/signin");
+                            },
+                            child: Text(
+                              "Click Here",
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: AppColors.primaryColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -121,10 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                       width: dynamicWidth,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushReplacementNamed("/homepage");
-                        },
+                        onPressed: _login,
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
@@ -140,9 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                        // height: 40,
-                        ),
+                    const SizedBox(),
                     const Spacer(),
                   ],
                 ),
