@@ -28,7 +28,7 @@ class _SignupPageState extends State<SignupPage> {
         email: email,
         password: password,
       );
-      Navigator.of(context).pushReplacementNamed("/profilecompletion");
+      Navigator.of(context).pushReplacementNamed("/userdetails");
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');

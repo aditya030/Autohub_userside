@@ -1,4 +1,4 @@
-
+import 'package:autohub_app/pages/firestore_database.dart';
 import 'package:autohub_app/pages/sample_maps.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
         '/destination': (context) => DestinationPage(),
         '/rideconfirmation': (context) => RideConfirmationPage(),
         '/userbidpage': (context) => UserBidPage(),
-        '/samplemap': (context) => SampleMaps(),
+        '/samplemap': (context) => SampleMaps(),       
       },
     );
   }
