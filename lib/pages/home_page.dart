@@ -33,12 +33,13 @@ class _HomePageState extends State<HomePage> {
 
   void initState() {
     super.initState();
-    getLocationupdates().then((_) => {
-          getPolylinePoints().then((coordinates) => {
-                // print(coordinates),
-                generatePolylinesFromPoints(coordinates),
-              }),
-        });
+    getLocationupdates();
+    // getLocationupdates().then((_) => {
+    //       getPolylinePoints().then((coordinates) => {
+    //             // print(coordinates),
+    //             generatePolylinesFromPoints(coordinates),
+    //           }),
+    //     });
   }
 
   @override
@@ -66,22 +67,22 @@ class _HomePageState extends State<HomePage> {
                       _mapController.complete(controller)),
                   mapType: MapType.normal,
                   initialCameraPosition:
-                      CameraPosition(target: _pSource, zoom: 13),
+                      CameraPosition(target: _pCurrentLocation!, zoom: 13),
                   markers: {
                     Marker(
                         markerId: MarkerId("_currentLocation"),
                         icon: BitmapDescriptor.defaultMarkerWithHue(90),
                         position: _pCurrentLocation!),
-                    Marker(
-                        markerId: MarkerId("_sourceLocation"),
-                        icon: BitmapDescriptor.defaultMarker,
-                        position: _pSource),
-                    Marker(
-                        markerId: MarkerId("_destionationLocation"),
-                        icon: BitmapDescriptor.defaultMarker,
-                        position: _pDestination),
+                    // Marker(
+                    //     markerId: MarkerId("_sourceLocation"),
+                    //     icon: BitmapDescriptor.defaultMarker,
+                    //     position: _pSource),
+                    // Marker(
+                    //     markerId: MarkerId("_destionationLocation"),
+                    //     icon: BitmapDescriptor.defaultMarker,
+                    //     position: _pDestination),
                   },
-                  polylines: Set<Polyline>.of(polylines.values),
+                  // polylines: Set<Polyline>.of(polylines.values),
                 ),
           Padding(
             padding: const EdgeInsets.only(top: 50, left: 10),
