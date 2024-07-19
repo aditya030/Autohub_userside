@@ -34,12 +34,12 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getLocationupdates();
-    // getLocationupdates().then((_) => {
-    //       getPolylinePoints().then((coordinates) => {
-    //             // print(coordinates),
-    //             generatePolylinesFromPoints(coordinates),
-    //           }),
-    //     });
+    getLocationupdates().then((_) => {
+          getPolylinePoints().then((coordinates) => {
+                // print(coordinates),
+                generatePolylinesFromPoints(coordinates),
+              }),
+        });
   }
 
   @override

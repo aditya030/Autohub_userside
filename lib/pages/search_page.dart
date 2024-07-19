@@ -10,6 +10,7 @@ import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -28,6 +29,8 @@ class _SearchPageState extends State<SearchPage> {
   LatLng? _pCurrentLocation;
   LatLng? _pSourceLocation;
   LatLng? _pDestinationLocation;
+  Map<PolylineId, Polyline> polylines = {};
+  List<LatLng> polylinesCoordinates = [];
   late GoogleMapController mapController;
   Location _locationController = Location();
 
@@ -116,6 +119,7 @@ class _SearchPageState extends State<SearchPage> {
                         position: _pDestinationLocation!,
                       ),
                   },
+                  polylines: Set<Polyline>.of(polylines.values),
                 ),
           Padding(
             padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
@@ -132,43 +136,49 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   child: Column(
                     children: [
-                      TextField(
-                        controller: searchPlaceController,
-                        decoration: const InputDecoration(
-                          hintText: "Search Source Location",
-                          hintStyle: TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w500,
+                      Padding(
+                        padding: const EdgeInsets.only(right: 25),
+                        child: TextField(
+                          controller: searchPlaceController,
+                          decoration: const InputDecoration(
+                            hintText: "Search Source Location",
+                            hintStyle: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.circle,
+                              color: Colors.green,
+                              size: 15,
+                            ),
+                            border: InputBorder.none,
                           ),
-                          prefixIcon: Icon(
-                            Icons.circle,
-                            color: Colors.green,
-                            size: 15,
-                          ),
-                          border: InputBorder.none,
+                          onChanged: (value) {
+                            placeAutocomplete(value, true);
+                          },
                         ),
-                        onChanged: (value) {
-                          placeAutocomplete(value, true);
-                        },
                       ),
                       const Divider(
                         height: 0.0,
                       ),
-                      TextField(
-                        controller: destinationPlaceController,
-                        decoration: const InputDecoration(
-                          hintText: "Search Destination Location",
-                          hintStyle: TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w500,
+                      Padding(
+                        padding: const EdgeInsets.only(right: 25),
+                        child: TextField(
+                          controller: destinationPlaceController,
+                          decoration: const InputDecoration(
+                            hintText: "Search Destination Location",
+                            hintStyle: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            prefixIcon: Icon(Icons.search_outlined,
+                                color: Colors.grey, size: 20),
+                            border: InputBorder.none,
                           ),
-                          prefixIcon: Icon(Icons.search_outlined,
-                              color: Colors.grey, size: 20),
-                          border: InputBorder.none,
+                          onChanged: (value) {
+                            placeAutocomplete(value, false);
+                          },
                         ),
-                        onChanged: (value) {
-                          placeAutocomplete(value, false);
-                        },
                       ),
                     ],
                   ),
@@ -197,8 +207,9 @@ class _SearchPageState extends State<SearchPage> {
                               });
                               mapController.animateCamera(
                                 CameraUpdate.newLatLngZoom(
-                                    selectedLocation, 13),
+                                    selectedLocation, 15),
                               );
+                              await updatePolylines();
                             }
                           }),
                     ),
@@ -226,8 +237,9 @@ class _SearchPageState extends State<SearchPage> {
                               });
                               mapController.animateCamera(
                                 CameraUpdate.newLatLngZoom(
-                                    selectedLocation, 13),
+                                    selectedLocation, 15),
                               );
+                              await updatePolylines();
                             }
                           }),
                     ),
@@ -301,5 +313,64 @@ class _SearchPageState extends State<SearchPage> {
         });
       }
     });
+  }
+
+  Future<List<LatLng>> getPolylinePoints_Search() async {
+    List<LatLng> polylineCoordinates = [];
+    if (_pSourceLocation != null && _pDestinationLocation != null) {
+      PolylinePoints polylinePoints = PolylinePoints();
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          googleApiKey: GoogleApiKey,
+          request: PolylineRequest(
+              origin: PointLatLng(
+                  _pSourceLocation!.latitude, _pSourceLocation!.longitude),
+              destination: PointLatLng(_pDestinationLocation!.latitude,
+                  _pDestinationLocation!.longitude),
+              mode: TravelMode.driving));
+      if (result.points.isNotEmpty) {
+        result.points.forEach((PointLatLng point) {
+          polylineCoordinates
+              .add(LatLng(point.latitude, point.longitude));
+        });
+      } else {
+        print(result.errorMessage);
+      }
+    }
+    return polylineCoordinates;
+  }
+
+  generatePolylinesFromPoints(List<LatLng> coordinates) {
+    PolylineId id = PolylineId("poly");
+    Polyline polyline = Polyline(
+        polylineId: id,
+        color: Colors.green,
+        points: coordinates,
+        width: 5);
+    setState(() {
+      polylines[id] = polyline;
+    });
+  }
+
+  Future<void> updatePolylines() async {
+    List<LatLng> coordinates = await getPolylinePoints_Search();
+    generatePolylinesFromPoints(coordinates);
+
+    // Update camera position to fit the polyline bounds
+    if (coordinates.isNotEmpty) {
+      LatLngBounds bounds = _getLatLngBounds(coordinates);
+      mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+    }
+  }
+
+  LatLngBounds _getLatLngBounds(List<LatLng> coordinates) {
+    LatLng southwest = coordinates.reduce((value, element) =>
+        LatLng(
+            value.latitude < element.latitude ? value.latitude : element.latitude,
+            value.longitude < element.longitude ? value.longitude : element.longitude));
+    LatLng northeast = coordinates.reduce((value, element) =>
+        LatLng(
+            value.latitude > element.latitude ? value.latitude : element.latitude,
+            value.longitude > element.longitude ? value.longitude : element.longitude));
+    return LatLngBounds(southwest: southwest, northeast: northeast);
   }
 }
