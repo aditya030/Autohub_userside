@@ -195,7 +195,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       DropdownButton<String>(
                         value: 'Cash',
-                        items: <String>['Cash', 'Credit', 'Debit'].map((String value) {
+                        items: <String>['Cash','UPI'].map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -213,6 +213,7 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                     onPressed: () {
                       // Handle Choose Destination
+                      
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
