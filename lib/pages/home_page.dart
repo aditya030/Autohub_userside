@@ -35,6 +35,12 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getLocationUpdates();
+    getLocationUpdates().then((_) => {
+          getPolylinePoints().then((coordinates) => {
+                // print(coordinates),
+                generatePolylinesFromPoints(coordinates),
+              }),
+        });
   }
 
   @override
@@ -62,25 +68,23 @@ class _HomePageState extends State<HomePage> {
                     _setMapStyle();
                   },
                   mapType: MapType.normal,
-                  initialCameraPosition: CameraPosition(target: _pCurrentLocation!, zoom: 13),
+                  initialCameraPosition:
+                      CameraPosition(target: _pCurrentLocation!, zoom: 13),
                   markers: {
                     Marker(
-                      markerId: MarkerId("_currentLocation"),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(90),
-                      position: _pCurrentLocation!,
-                    ),
-                    Marker(
-                      markerId: MarkerId("_sourceLocation"),
-                      icon: BitmapDescriptor.defaultMarker,
-                      position: _pSource,
-                    ),
-                    Marker(
-                      markerId: MarkerId("_destinationLocation"),
-                      icon: BitmapDescriptor.defaultMarker,
-                      position: _pDestination,
-                    ),
+                        markerId: MarkerId("_currentLocation"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                        position: _pCurrentLocation!),
+                    // Marker(
+                    //     markerId: MarkerId("_sourceLocation"),
+                    //     icon: BitmapDescriptor.defaultMarker,
+                    //     position: _pSource),
+                    // Marker(
+                    //     markerId: MarkerId("_destionationLocation"),
+                    //     icon: BitmapDescriptor.defaultMarker,
+                    //     position: _pDestination),
                   },
-                  polylines: Set<Polyline>.of(polylines.values),
+                  // polylines: Set<Polyline>.of(polylines.values),
                 ),
           Positioned(
             top: 50,
