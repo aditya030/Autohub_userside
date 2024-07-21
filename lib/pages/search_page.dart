@@ -120,6 +120,7 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                   },
                   polylines: Set<Polyline>.of(polylines.values),
+                  
                 ),
           Padding(
             padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
