@@ -1,11 +1,13 @@
 import 'dart:async';
-import 'dart:convert'; // Add this import
+import 'dart:convert';
+import 'package:autohub_app/pages/home_page.dart';
+import 'package:http/http.dart' as http;
 import 'package:autohub_app/components/const.dart';
 import 'package:autohub_app/components/location_list_tile.dart';
 import 'package:autohub_app/components/network_utility.dart';
 import 'package:autohub_app/models/autocomplete_prediction.dart';
 import 'package:autohub_app/models/place_auto_complete_response.dart';
-import 'package:autohub_app/models/place_details_response.dart'; // Import the place details response model
+import 'package:autohub_app/models/place_details_response.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -33,6 +35,9 @@ class _SearchPageState extends State<SearchPage> {
   List<LatLng> polylinesCoordinates = [];
   late GoogleMapController mapController;
   Location _locationController = Location();
+
+  String distance = '';
+  String duration = '';
 
   Future<void> placeAutocomplete(String query, bool isSource) async {
     Uri uri =
@@ -120,7 +125,6 @@ class _SearchPageState extends State<SearchPage> {
                       ),
                   },
                   polylines: Set<Polyline>.of(polylines.values),
-                  
                 ),
           Padding(
             padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
@@ -196,9 +200,8 @@ class _SearchPageState extends State<SearchPage> {
                       itemBuilder: (context, index) => LocationListTile(
                           location: sourcePlacePredictions[index].description!,
                           press: () async {
-                            LatLng? selectedLocation =
-                                await getPlaceDetails(
-                                    sourcePlacePredictions[index].placeId!);
+                            LatLng? selectedLocation = await getPlaceDetails(
+                                sourcePlacePredictions[index].placeId!);
                             if (selectedLocation != null) {
                               setState(() {
                                 _pSourceLocation = selectedLocation;
@@ -221,13 +224,11 @@ class _SearchPageState extends State<SearchPage> {
                     child: ListView.builder(
                       itemCount: destinationPlacePredictions.length,
                       itemBuilder: (context, index) => LocationListTile(
-                          location: destinationPlacePredictions[index]
-                              .description!,
+                          location:
+                              destinationPlacePredictions[index].description!,
                           press: () async {
-                            LatLng? selectedLocation =
-                                await getPlaceDetails(
-                                    destinationPlacePredictions[index]
-                                        .placeId!);
+                            LatLng? selectedLocation = await getPlaceDetails(
+                                destinationPlacePredictions[index].placeId!);
                             if (selectedLocation != null) {
                               setState(() {
                                 _pDestinationLocation = selectedLocation;
@@ -249,12 +250,18 @@ class _SearchPageState extends State<SearchPage> {
                 // Container to display the Current Location button
                 if (searchPlaceController.text.isEmpty)
                   Container(
-                    width: screenWidth * 0.55,
+                    width: screenWidth * 0.5,
                     height: screenHeight * 0.05,
                     child: ElevatedButton(
                       onPressed: () {
                         placeAutocomplete("Dubai", true);
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -266,13 +273,53 @@ class _SearchPageState extends State<SearchPage> {
                             width: 10,
                           ),
                           Text(
-                            "Your Current Location",
-                            style: TextStyle(color: Colors.black),
+                            "Current Location",
+                            style: TextStyle(color: AppColors.backgroundColor),
                           ),
                         ],
                       ),
                     ),
                   ),
+                // Add the distance and duration display
+                if (distance.isNotEmpty && duration.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Text(
+                      'Distance: $distance, Duration: $duration',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                Spacer(),
+                Container(
+                  width: screenWidth * 0.8,
+                  height: screenHeight * 0.06,
+                  child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomePage()));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      ),
+                      child: Text("Continue", style: TextStyle(
+                        color: AppColors.backgroundColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),)),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.05,
+                )
               ],
             ),
           ),
@@ -330,8 +377,7 @@ class _SearchPageState extends State<SearchPage> {
               mode: TravelMode.driving));
       if (result.points.isNotEmpty) {
         result.points.forEach((PointLatLng point) {
-          polylineCoordinates
-              .add(LatLng(point.latitude, point.longitude));
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
         });
       } else {
         print(result.errorMessage);
@@ -343,10 +389,7 @@ class _SearchPageState extends State<SearchPage> {
   generatePolylinesFromPoints(List<LatLng> coordinates) {
     PolylineId id = PolylineId("poly");
     Polyline polyline = Polyline(
-        polylineId: id,
-        color: Colors.green,
-        points: coordinates,
-        width: 5);
+        polylineId: id, color: Colors.green, points: coordinates, width: 5);
     setState(() {
       polylines[id] = polyline;
     });
@@ -356,22 +399,61 @@ class _SearchPageState extends State<SearchPage> {
     List<LatLng> coordinates = await getPolylinePoints_Search();
     generatePolylinesFromPoints(coordinates);
 
-    // Update camera position to fit the polyline bounds
     if (coordinates.isNotEmpty) {
       LatLngBounds bounds = _getLatLngBounds(coordinates);
       mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+
+      // Fetch and display the distance and duration
+      if (_pSourceLocation != null && _pDestinationLocation != null) {
+        final result = await getDistanceAndDuration(
+            _pSourceLocation!, _pDestinationLocation!);
+        setState(() {
+          distance = result['distance'];
+          duration = result['duration'];
+        });
+      }
     }
   }
 
   LatLngBounds _getLatLngBounds(List<LatLng> coordinates) {
-    LatLng southwest = coordinates.reduce((value, element) =>
-        LatLng(
-            value.latitude < element.latitude ? value.latitude : element.latitude,
-            value.longitude < element.longitude ? value.longitude : element.longitude));
-    LatLng northeast = coordinates.reduce((value, element) =>
-        LatLng(
-            value.latitude > element.latitude ? value.latitude : element.latitude,
-            value.longitude > element.longitude ? value.longitude : element.longitude));
+    LatLng southwest = coordinates.reduce((value, element) => LatLng(
+        value.latitude < element.latitude ? value.latitude : element.latitude,
+        value.longitude < element.longitude
+            ? value.longitude
+            : element.longitude));
+    LatLng northeast = coordinates.reduce((value, element) => LatLng(
+        value.latitude > element.latitude ? value.latitude : element.latitude,
+        value.longitude > element.longitude
+            ? value.longitude
+            : element.longitude));
     return LatLngBounds(southwest: southwest, northeast: northeast);
+  }
+
+  Future<Map<String, dynamic>> getDistanceAndDuration(
+      LatLng origin, LatLng destination) async {
+    final String url =
+        'https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.latitude},${origin.longitude}&destinations=${destination.latitude},${destination.longitude}&key=$GoogleApiKey';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      if (data['rows'].isNotEmpty) {
+        final elements = data['rows'][0]['elements'][0];
+
+        final distanceText = elements['distance']['text'];
+        final durationText = elements['duration']['text'];
+
+        return {
+          'distance': distanceText,
+          'duration': durationText,
+        };
+      }
+    }
+    return {
+      'distance': 'N/A',
+      'duration': 'N/A',
+    };
   }
 }

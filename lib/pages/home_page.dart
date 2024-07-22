@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:autohub_app/components/const.dart';
 import 'package:autohub_app/components/text_field_style.dart';
+import 'package:autohub_app/pages/destination_page.dart';
 import 'package:autohub_app/pages/user_details_page.dart';
 import 'package:autohub_app/pages/search_page.dart'; // Import the search page
 import 'package:autohub_app/styles/app_colors.dart';
@@ -213,12 +214,15 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                     onPressed: () {
                       // Handle Choose Destination
-                      
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => DestinationPage(),
+                      ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
                       padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                     ),
