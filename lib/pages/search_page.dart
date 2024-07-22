@@ -93,15 +93,9 @@ class _SearchPageState extends State<SearchPage> {
       body: Stack(
         children: [
           _pCurrentLocation == null
-              ? const Center(
-                  child: Text(
-                    "Loading...",
-                    style: TextStyle(
-                      color: AppColors.primaryColor,
-                      fontSize: 20,
-                    ),
-                  ),
-                )
+              ?  Center(
+                  child: Image.asset('assets/icons/loading_animation.gif', width: screenHeight*0.3,),
+                  )
               : GoogleMap(
                   onMapCreated: ((GoogleMapController controller) {
                     _mapController.complete(controller);

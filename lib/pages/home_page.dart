@@ -54,15 +54,9 @@ class _HomePageState extends State<HomePage> {
       body: Stack(
         children: [
           _pCurrentLocation == null
-              ? const Center(
-                  child: Text(
-                    "Loading...",
-                    style: TextStyle(
-                      color: AppColors.primaryColor,
-                      fontSize: 20,
-                    ),
-                  ),
-                )
+              ? Center(
+                  child: Image.asset('assets/icons/loading_animation.gif', width: screenHeight*0.3,),
+                  )
               : GoogleMap(
                   onMapCreated: (GoogleMapController controller) {
                     _mapController.complete(controller);
@@ -89,15 +83,18 @@ class _HomePageState extends State<HomePage> {
                 ),
           Positioned(
             top: 50,
-            left: 10,
-            right: 10,
+            left: 15,
+            right: 15,
             child: Row(
               children: [
                 Expanded(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.backgroundColor,
                       borderRadius: BorderRadius.circular(30),
+                      // border: Border.all(
+                      //   // color: Colors.black,
+                      // ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black26,
@@ -109,8 +106,9 @@ class _HomePageState extends State<HomePage> {
                     child: TextField(
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Search',
-                        prefixIcon: Icon(Icons.search),
+                        hintText: 'Search Location',
+                        hintStyle: TextStyle(color: AppColors.primaryColor, fontSize: 18),
+                        prefixIcon: Icon(Icons.search, color: AppColors.primaryColor,),
                         contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                       ),
                       onChanged: (value) {
@@ -140,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                   child: CircleAvatar(
-                    radius: 20,
+                    radius: 23,
                     backgroundImage: AssetImage('assets/images/user2.png'),
                   ),
                 ),
