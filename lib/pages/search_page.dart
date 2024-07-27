@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:autohub_app/pages/distance_matrix_response.dart';
 import 'package:autohub_app/pages/home_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:autohub_app/components/const.dart';
 import 'package:autohub_app/components/location_list_tile.dart';
@@ -26,8 +29,7 @@ class _SearchPageState extends State<SearchPage> {
   List<AutocompletePrediction> destinationPlacePredictions = [];
   TextEditingController searchPlaceController = TextEditingController();
   TextEditingController destinationPlaceController = TextEditingController();
-  final Completer<GoogleMapController> _mapController =
-      Completer<GoogleMapController>();
+  final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
   LatLng? _pCurrentLocation;
   LatLng? _pSourceLocation;
   LatLng? _pDestinationLocation;
@@ -40,15 +42,13 @@ class _SearchPageState extends State<SearchPage> {
   String duration = '';
 
   Future<void> placeAutocomplete(String query, bool isSource) async {
-    Uri uri =
-        Uri.https("maps.googleapis.com", "maps/api/place/autocomplete/json", {
+    Uri uri = Uri.https("maps.googleapis.com", "maps/api/place/autocomplete/json", {
       "input": query,
       "key": GoogleApiKey,
     });
     String? response = await NetworkUtility.fetchUrl(uri);
     if (response != null) {
-      PlaceAutocompleteResponse result =
-          PlaceAutocompleteResponse.parseAutocompleteResult(response);
+      PlaceAutocompleteResponse result = PlaceAutocompleteResponse.parseAutocompleteResult(response);
       if (result.predictions != null) {
         setState(() {
           if (isSource) {
@@ -68,8 +68,7 @@ class _SearchPageState extends State<SearchPage> {
     });
     String? response = await NetworkUtility.fetchUrl(uri);
     if (response != null) {
-      PlaceDetailsResponse result =
-          PlaceDetailsResponse.parsePlaceDetailsResult(response);
+      PlaceDetailsResponse result = PlaceDetailsResponse.parsePlaceDetailsResult(response);
       if (result.result != null) {
         final location = result.result!.geometry!.location;
         return LatLng(location!.lat, location.lng);
@@ -102,8 +101,7 @@ class _SearchPageState extends State<SearchPage> {
                     mapController = controller;
                   }),
                   mapType: MapType.normal,
-                  initialCameraPosition:
-                      CameraPosition(target: _pCurrentLocation!, zoom: 13),
+                  initialCameraPosition: CameraPosition(target: _pCurrentLocation!, zoom: 13),
                   markers: {
                     if (_pSourceLocation != null)
                       Marker(
@@ -199,8 +197,7 @@ class _SearchPageState extends State<SearchPage> {
                             if (selectedLocation != null) {
                               setState(() {
                                 _pSourceLocation = selectedLocation;
-                                searchPlaceController.text =
-                                    sourcePlacePredictions[index].description!;
+                                searchPlaceController.text = sourcePlacePredictions[index].description!;
                                 sourcePlacePredictions.clear();
                               });
                               mapController.animateCamera(
@@ -226,9 +223,7 @@ class _SearchPageState extends State<SearchPage> {
                             if (selectedLocation != null) {
                               setState(() {
                                 _pDestinationLocation = selectedLocation;
-                                destinationPlaceController.text =
-                                    destinationPlacePredictions[index]
-                                        .description!;
+                                destinationPlaceController.text = destinationPlacePredictions[index].description!;
                                 destinationPlacePredictions.clear();
                               });
                               mapController.animateCamera(
@@ -280,40 +275,21 @@ class _SearchPageState extends State<SearchPage> {
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Text(
                       'Distance: $distance, Duration: $duration',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
-                Spacer(),
-                Container(
-                  width: screenWidth * 0.8,
-                  height: screenHeight * 0.06,
-                  child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomePage()));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                      ),
-                      child: Text("Continue", style: TextStyle(
-                        color: AppColors.backgroundColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),)),
-                ),
-                SizedBox(
-                  height: screenHeight * 0.05,
-                )
+                if (_pSourceLocation != null && _pDestinationLocation != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 20),
+                    child: ElevatedButton(
+                      onPressed: saveRideDetails,
+                      child: const Text('Confirm'),
+                      
+                    ),
+                  ),
               ],
             ),
           ),
@@ -322,132 +298,91 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Future<void> getLocationUpdates() async {
-    bool _serviceEnabled;
-    PermissionStatus _locationPermissionGranted;
-
-    // If Location is disabled send a prompt saying to turn on the location.
-    _serviceEnabled = await _locationController.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await _locationController.requestService();
-      if (!_serviceEnabled) {
+  void getLocationUpdates() async {
+    bool serviceEnabled = await _locationController.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await _locationController.requestService();
+      if (!serviceEnabled) {
         return;
       }
     }
 
-    _locationPermissionGranted = await _locationController.hasPermission();
-    if (_locationPermissionGranted == PermissionStatus.denied) {
-      _locationPermissionGranted =
-          await _locationController.requestPermission();
-      if (_locationPermissionGranted != PermissionStatus.granted) {
+    PermissionStatus permissionGranted = await _locationController.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await _locationController.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
         return;
       }
     }
 
-    _locationController.onLocationChanged
-        .listen((LocationData currentLocation) {
-      if (currentLocation.latitude != null &&
-          currentLocation.longitude != null) {
+    _locationController.onLocationChanged.listen((LocationData currentLocation) {
+      if (mounted) {
         setState(() {
-          _pCurrentLocation =
-              LatLng(currentLocation.latitude!, currentLocation.longitude!);
-          print("Current Position: $currentLocation");
+          _pCurrentLocation = LatLng(currentLocation.latitude!, currentLocation.longitude!);
         });
       }
-    });
-  }
-
-  Future<List<LatLng>> getPolylinePoints_Search() async {
-    List<LatLng> polylineCoordinates = [];
-    if (_pSourceLocation != null && _pDestinationLocation != null) {
-      PolylinePoints polylinePoints = PolylinePoints();
-      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-          googleApiKey: GoogleApiKey,
-          request: PolylineRequest(
-              origin: PointLatLng(
-                  _pSourceLocation!.latitude, _pSourceLocation!.longitude),
-              destination: PointLatLng(_pDestinationLocation!.latitude,
-                  _pDestinationLocation!.longitude),
-              mode: TravelMode.driving));
-      if (result.points.isNotEmpty) {
-        result.points.forEach((PointLatLng point) {
-          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-        });
-      } else {
-        print(result.errorMessage);
-      }
-    }
-    return polylineCoordinates;
-  }
-
-  generatePolylinesFromPoints(List<LatLng> coordinates) {
-    PolylineId id = PolylineId("poly");
-    Polyline polyline = Polyline(
-        polylineId: id, color: Colors.green, points: coordinates, width: 5);
-    setState(() {
-      polylines[id] = polyline;
     });
   }
 
   Future<void> updatePolylines() async {
-    List<LatLng> coordinates = await getPolylinePoints_Search();
-    generatePolylinesFromPoints(coordinates);
+    if (_pSourceLocation != null && _pDestinationLocation != null) {
+      polylinesCoordinates.clear();
+      polylinesCoordinates.add(_pSourceLocation!);
+      polylinesCoordinates.add(_pDestinationLocation!);
 
-    if (coordinates.isNotEmpty) {
-      LatLngBounds bounds = _getLatLngBounds(coordinates);
-      mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+      setState(() {
+        polylines.clear();
+        PolylineId id = PolylineId("poly");
+        Polyline polyline = Polyline(
+          polylineId: id,
+          color: Colors.blue,
+          points: polylinesCoordinates,
+          width: 5,
+        );
+        polylines[id] = polyline;
+      });
 
-      // Fetch and display the distance and duration
-      if (_pSourceLocation != null && _pDestinationLocation != null) {
-        final result = await getDistanceAndDuration(
-            _pSourceLocation!, _pDestinationLocation!);
-        setState(() {
-          distance = result['distance'];
-          duration = result['duration'];
-        });
+      // Calculate distance and duration
+      Uri uri = Uri.https("maps.googleapis.com", "maps/api/distancematrix/json", {
+        "origins": '${_pSourceLocation!.latitude},${_pSourceLocation!.longitude}',
+        "destinations": '${_pDestinationLocation!.latitude},${_pDestinationLocation!.longitude}',
+        "key": GoogleApiKey,
+      });
+      String? response = await NetworkUtility.fetchUrl(uri);
+      if (response != null) {
+        DistanceMatrixResponse result = DistanceMatrixResponse.parseDistanceMatrixResult(response);
+        if (result.rows.isNotEmpty &&
+            result.rows[0].elements.isNotEmpty &&
+            result.rows[0].elements[0].status == 'OK') {
+          setState(() {
+            distance = result.rows[0].elements[0].distance.text;
+            duration = result.rows[0].elements[0].duration.text;
+          });
+        }
       }
     }
   }
 
-  LatLngBounds _getLatLngBounds(List<LatLng> coordinates) {
-    LatLng southwest = coordinates.reduce((value, element) => LatLng(
-        value.latitude < element.latitude ? value.latitude : element.latitude,
-        value.longitude < element.longitude
-            ? value.longitude
-            : element.longitude));
-    LatLng northeast = coordinates.reduce((value, element) => LatLng(
-        value.latitude > element.latitude ? value.latitude : element.latitude,
-        value.longitude > element.longitude
-            ? value.longitude
-            : element.longitude));
-    return LatLngBounds(southwest: southwest, northeast: northeast);
-  }
+  Future<void> saveRideDetails() async {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
 
-  Future<Map<String, dynamic>> getDistanceAndDuration(
-      LatLng origin, LatLng destination) async {
-    final String url =
-        'https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.latitude},${origin.longitude}&destinations=${destination.latitude},${destination.longitude}&key=$GoogleApiKey';
+    if (user != null && _pSourceLocation != null && _pDestinationLocation != null) {
+      await FirebaseFirestore.instance.collection('rides').doc(user.uid).set({
+        'source': GeoPoint(_pSourceLocation!.latitude, _pSourceLocation!.longitude),
+        'destination': GeoPoint(_pDestinationLocation!.latitude, _pDestinationLocation!.longitude),
+        'distance': distance,
+        'duration': duration,
+      });
 
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-
-      if (data['rows'].isNotEmpty) {
-        final elements = data['rows'][0]['elements'][0];
-
-        final distanceText = elements['distance']['text'];
-        final durationText = elements['duration']['text'];
-
-        return {
-          'distance': distanceText,
-          'duration': durationText,
-        };
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ride details saved successfully!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to save ride details. Please try again.')),
+      );
+      
     }
-    return {
-      'distance': 'N/A',
-      'duration': 'N/A',
-    };
   }
 }
