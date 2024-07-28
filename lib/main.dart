@@ -2,6 +2,7 @@ import 'package:autohub_app/pages/firestore_database.dart';
 import 'package:autohub_app/pages/homepage_sample.dart';
 import 'package:autohub_app/pages/sample_maps.dart';
 import 'package:autohub_app/pages/search_page_sample.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -35,6 +36,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  static LatLng _pSource = LatLng(12.9692, 79.1559);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -42,12 +44,12 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/searchpage-sample',
+      initialRoute: '/',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
         '/homepage': (context) => HomePage(),
-        // '/searchpage': (context) => SearchPage(),
+        '/searchpage': (context) => SearchPage(_pSource),
         '/ridecompletion': (context) => RideCompletion(),
         '/Auto_details': (context) => BookingPage(),
         '/userdetails': (context) => user_details.UserDetailsPage(),

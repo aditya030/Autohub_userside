@@ -1,14 +1,23 @@
 import 'dart:async';
-import 'package:autohub_app/components/const.dart';
-import 'package:autohub_app/components/text_field_style.dart';
+import 'dart:convert';
 import 'package:autohub_app/pages/destination_page.dart';
+import 'package:autohub_app/pages/destination_page_sample.dart';
+import 'package:autohub_app/pages/home_page.dart';
+import 'package:autohub_app/pages/map_ride_price_page.dart';
+import 'package:autohub_app/pages/search_page.dart';
 import 'package:autohub_app/pages/user_details_page.dart';
-import 'package:autohub_app/pages/search_page.dart'; // Import the search page
+import 'package:http/http.dart' as http;
+import 'package:autohub_app/components/const.dart';
+import 'package:autohub_app/components/location_list_tile.dart';
+import 'package:autohub_app/components/network_utility.dart';
+import 'package:autohub_app/models/autocomplete_prediction.dart';
+import 'package:autohub_app/models/place_auto_complete_response.dart';
+import 'package:autohub_app/models/place_details_response.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:location/location.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,133 +27,250 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  List<AutocompletePrediction> sourcePlacePredictions = [];
+  List<AutocompletePrediction> destinationPlacePredictions = [];
+  TextEditingController searchPlaceController = TextEditingController();
+  TextEditingController destinationPlaceController = TextEditingController();
+  final Completer<GoogleMapController> _mapController =
+      Completer<GoogleMapController>();
+  LatLng? _pCurrentLocation;
+  LatLng? _pSourceLocation;
+  LatLng? _pDestinationLocation;
+  Map<PolylineId, Polyline> polylines = {};
+  List<LatLng> polylinesCoordinates = [];
+  late GoogleMapController mapController;
+  Location _locationController = Location();
+
+  String distance = '';
+  String duration = '';
+  
   bool isPremiumSelected = true;
 
-  // Static constant data
-  static LatLng _pSource = LatLng(12.9692, 79.1559);
-  static LatLng _pDestination = LatLng(12.9244, 79.1353);
+  Future<void> placeAutocomplete(String query, bool isSource) async {
+    Uri uri =
+        Uri.https("maps.googleapis.com", "maps/api/place/autocomplete/json", {
+      "input": query,
+      "key": GoogleApiKey,
+    });
+    String? response = await NetworkUtility.fetchUrl(uri);
+    if (response != null) {
+      PlaceAutocompleteResponse result =
+          PlaceAutocompleteResponse.parseAutocompleteResult(response);
+      if (result.predictions != null) {
+        setState(() {
+          if (isSource) {
+            sourcePlacePredictions = result.predictions!;
+          } else {
+            destinationPlacePredictions = result.predictions!;
+          }
+        });
+      }
+    }
+  }
 
-  final Completer<GoogleMapController> _mapController = Completer<GoogleMapController>();
-
-  LatLng? _pCurrentLocation;
-
-  late GoogleMapController mapController;
-  Map<PolylineId, Polyline> polylines = {};
-  Location _locationController = Location();
+  Future<LatLng?> getPlaceDetails(String placeId) async {
+    Uri uri = Uri.https("maps.googleapis.com", "maps/api/place/details/json", {
+      "place_id": placeId,
+      "key": GoogleApiKey,
+    });
+    String? response = await NetworkUtility.fetchUrl(uri);
+    if (response != null) {
+      PlaceDetailsResponse result =
+          PlaceDetailsResponse.parsePlaceDetailsResult(response);
+      if (result.result != null) {
+        final location = result.result!.geometry!.location;
+        return LatLng(location!.lat, location.lng);
+      }
+    }
+    return null;
+  }
 
   @override
   void initState() {
     super.initState();
     getLocationUpdates();
-    getLocationUpdates().then((_) => {
-          getPolylinePoints().then((coordinates) => {
-                // print(coordinates),
-                generatePolylinesFromPoints(coordinates),
-              }),
-        });
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           _pCurrentLocation == null
               ? Center(
-                  child: Image.asset('assets/icons/loading_animation.gif', width: screenHeight*0.3,),
-                  )
+                  child: Image.asset(
+                    'assets/icons/loading_animation.gif',
+                    width: screenHeight * 0.3,
+                  ),
+                )
               : GoogleMap(
-                  onMapCreated: (GoogleMapController controller) {
+                  onMapCreated: ((GoogleMapController controller) {
                     _mapController.complete(controller);
-                    _setMapStyle();
-                  },
+                    mapController = controller;
+                  }),
                   mapType: MapType.normal,
                   initialCameraPosition:
                       CameraPosition(target: _pCurrentLocation!, zoom: 13),
                   markers: {
-                    Marker(
-                        markerId: MarkerId("_currentLocation"),
+                    if (_pSourceLocation != null)
+                      Marker(
+                        markerId: MarkerId("_sourceLocation"),
                         icon: BitmapDescriptor.defaultMarkerWithHue(90),
-                        position: _pCurrentLocation!),
-                    // Marker(
-                    //     markerId: MarkerId("_sourceLocation"),
-                    //     icon: BitmapDescriptor.defaultMarker,
-                    //     position: _pSource),
-                    // Marker(
-                    //     markerId: MarkerId("_destionationLocation"),
-                    //     icon: BitmapDescriptor.defaultMarker,
-                    //     position: _pDestination),
-                  },
-                  // polylines: Set<Polyline>.of(polylines.values),
-                ),
-          Positioned(
-            top: 50,
-            left: 15,
-            right: 15,
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundColor,
-                      borderRadius: BorderRadius.circular(30),
-                      // border: Border.all(
-                      //   // color: Colors.black,
-                      // ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 5,
-                          offset: Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Search Location',
-                        hintStyle: TextStyle(color: AppColors.primaryColor, fontSize: 18),
-                        prefixIcon: Icon(Icons.search, color: AppColors.primaryColor,),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        position: _pSourceLocation!,
                       ),
-                      onChanged: (value) {
-                        // Handle text change
-                      },
+                    if (_pDestinationLocation != null)
+                      Marker(
+                        markerId: MarkerId("_destinationLocation"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                        position: _pDestinationLocation!,
+                      ),
+                  },
+                  polylines: Set<Polyline>.of(polylines.values),
+                ),
+          Padding(
+            padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
+            child: Column(
+              children: [
+                // Top Search Bar -> Source Location and Destination Location
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        // width: screenWidth * 0.75,
+                        // height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey.shade50,
+                          borderRadius: const BorderRadius.all(Radius.circular(30)),
+                          // border: Border.all(color: AppColors.primaryColor),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 5,
+                              offset: Offset(0, 5),
+                            ),],
+                        ),
+                        child: TextField(
+                          controller: searchPlaceController,
+                          decoration: const InputDecoration(
+                            hintText: "Search Location",
+                            hintStyle: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.search,
+                              color: Colors.black,
+                              size: 20,
+                            ),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                            border: InputBorder.none,
+                          ),
+                          onChanged: (value) {
+                            placeAutocomplete(value, true);
+                          },
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    GestureDetector(
                       onTap: () {
-                        // Navigate to search page
+                        // Navigate to UserDetailsPage
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DestinationPage(), // Ensure SearchPage is implemented
+                            builder: (context) => UserDetailsPage(),
                           ),
                         );
                       },
+                      child: CircleAvatar(
+                        radius: 23,
+                        backgroundImage: AssetImage('assets/images/user2.png'),
+                      ),
+                    ),
+                  ],
+                ),
+                // const SizedBox(
+                //   height: 10,
+                // ),
+
+                // Container to display the list of all the suggestions
+                if (searchPlaceController.text.isNotEmpty)
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: sourcePlacePredictions.length,
+                      itemBuilder: (context, index) => LocationListTile(
+                          location: sourcePlacePredictions[index].description!,
+                          press: () async {
+                            LatLng? selectedLocation = await getPlaceDetails(
+                                sourcePlacePredictions[index].placeId!);
+                            if (selectedLocation != null) {
+                              setState(() {
+                                _pSourceLocation = selectedLocation;
+                                searchPlaceController.text =
+                                    sourcePlacePredictions[index].description!;
+                                sourcePlacePredictions.clear();
+                              });
+                              mapController.animateCamera(
+                                CameraUpdate.newLatLngZoom(
+                                    selectedLocation, 15),
+                              );
+
+                              await updatePolylines();
+                            }
+                          }),
                     ),
                   ),
-                ),
-                SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    // Navigate to UserDetailsPage
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UserDetailsPage(),
-                      ),
-                    );
-                  },
-                  child: CircleAvatar(
-                    radius: 23,
-                    backgroundImage: AssetImage('assets/images/user2.png'),
+
+                if (destinationPlaceController.text.isNotEmpty)
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: destinationPlacePredictions.length,
+                      itemBuilder: (context, index) => LocationListTile(
+                          location:
+                              destinationPlacePredictions[index].description!,
+                          press: () async {
+                            LatLng? selectedLocation = await getPlaceDetails(
+                                destinationPlacePredictions[index].placeId!);
+                            if (selectedLocation != null) {
+                              setState(() {
+                                _pDestinationLocation = selectedLocation;
+                                destinationPlaceController.text =
+                                    destinationPlacePredictions[index]
+                                        .description!;
+                                destinationPlacePredictions.clear();
+                              });
+                              mapController.animateCamera(
+                                CameraUpdate.newLatLngZoom(
+                                    selectedLocation, 15),
+                              );
+                              await updatePolylines();
+                            }
+                          }),
+                    ),
                   ),
-                ),
+
+                
+                // Add the distance and duration display
+                // if (distance.isNotEmpty && duration.isNotEmpty)
+                //   Padding(
+                //     padding: const EdgeInsets.symmetric(vertical: 10),
+                //     child: Text(
+                //       'Distance: $distance, Duration: $duration',
+                //       style: TextStyle(
+                //         fontSize: 16,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // Spacer(),
               ],
             ),
           ),
+         
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -164,14 +290,39 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Choose your ride',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+
+                  Row(
+                    children: [
+                      Text(
+                        'Choose your ride',
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(width: screenWidth * 0.34,),
+                      // Container to display the Current Location button
+                if (searchPlaceController.text.isEmpty && destinationPlaceController.text.isEmpty)
+                  Container(
+                    width: screenWidth * 0.2,
+                    height: screenHeight * 0.04,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        placeAutocomplete("Dubai", true);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey.shade50,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                      child: const Icon(Icons.my_location, color: Colors.green, size: 20),
                     ),
                   ),
+                    ],
+                  ),
+                  
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -181,7 +332,9 @@ class _HomePageState extends State<HomePage> {
                           isPremiumSelected = false;
                         });
                       }),
-                      SizedBox(width: 10,),
+                      SizedBox(
+                        width: 10,
+                      ),
                       _buildButton('Premium Auto', isPremiumSelected, () {
                         setState(() {
                           isPremiumSelected = true;
@@ -195,7 +348,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       DropdownButton<String>(
                         value: 'Cash',
-                        items: <String>['Cash','UPI'].map((String value) {
+                        items: <String>['Cash', 'UPI'].map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -213,9 +366,12 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                     onPressed: () {
                       // Handle Choose Destination
-                      Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => DestinationPage(),
-                      ),
+                      // Navigator.pop(context,{'sourceLocation': _pSourceLocation});
+                      Navigator.push(
+                        context, 
+                        MaterialPageRoute(
+                          builder: (context) => SearchPage(_pSourceLocation),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -223,7 +379,8 @@ class _HomePageState extends State<HomePage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10.0),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -248,13 +405,12 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
   Widget _buildButton(String text, bool isSelected, VoidCallback onPressed) {
     return Expanded(
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected ? Colors.green : Colors.white,
+          backgroundColor: isSelected ? Colors.green : Colors.blueGrey.shade50,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
@@ -292,65 +448,128 @@ class _HomePageState extends State<HomePage> {
     bool _serviceEnabled;
     PermissionStatus _locationPermissionGranted;
 
+    // If Location is disabled send a prompt saying to turn on the location.
     _serviceEnabled = await _locationController.serviceEnabled();
     if (!_serviceEnabled) {
       _serviceEnabled = await _locationController.requestService();
-      if (!_serviceEnabled) return;
+      if (!_serviceEnabled) {
+        return;
+      }
     }
 
     _locationPermissionGranted = await _locationController.hasPermission();
     if (_locationPermissionGranted == PermissionStatus.denied) {
-      _locationPermissionGranted = await _locationController.requestPermission();
-      if (_locationPermissionGranted != PermissionStatus.granted) return;
+      _locationPermissionGranted =
+          await _locationController.requestPermission();
+      if (_locationPermissionGranted != PermissionStatus.granted) {
+        return;
+      }
     }
 
-    _locationController.onLocationChanged.listen((LocationData currentLocation) {
-      if (currentLocation.latitude != null && currentLocation.longitude != null) {
+    _locationController.onLocationChanged
+        .listen((LocationData currentLocation) {
+      if (currentLocation.latitude != null &&
+          currentLocation.longitude != null) {
         setState(() {
-          _pCurrentLocation = LatLng(currentLocation.latitude!, currentLocation.longitude!);
-          _updateMapLocation();
+          _pCurrentLocation =
+              LatLng(currentLocation.latitude!, currentLocation.longitude!);
+          print("Current Position: $currentLocation");
         });
       }
     });
-
-    // Fetch polyline points after location updates
-    getPolylinePoints().then((coordinates) {
-      generatePolylinesFromPoints(coordinates);
-    });
   }
 
-  Future<List<LatLng>> getPolylinePoints() async {
-    // Example: Fetching a route between two locations
-    List<LatLng> polylineCoordinates = [
-      _pSource,
-      _pDestination,
-    ];
-
-    // Fetch and parse polyline data if needed
+  Future<List<LatLng>> getPolylinePoints_Search() async {
+    List<LatLng> polylineCoordinates = [];
+    if (_pSourceLocation != null && _pDestinationLocation != null) {
+      PolylinePoints polylinePoints = PolylinePoints();
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          googleApiKey: GoogleApiKey,
+          request: PolylineRequest(
+              origin: PointLatLng(
+                  _pSourceLocation!.latitude, _pSourceLocation!.longitude),
+              destination: PointLatLng(_pDestinationLocation!.latitude,
+                  _pDestinationLocation!.longitude),
+              mode: TravelMode.driving));
+      if (result.points.isNotEmpty) {
+        result.points.forEach((PointLatLng point) {
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        });
+      } else {
+        print(result.errorMessage);
+      }
+    }
     return polylineCoordinates;
   }
 
-  void generatePolylinesFromPoints(List<LatLng> coordinates) {
+  generatePolylinesFromPoints(List<LatLng> coordinates) {
+    PolylineId id = PolylineId("poly");
+    Polyline polyline = Polyline(
+        polylineId: id, color: Colors.green, points: coordinates, width: 5);
     setState(() {
-      PolylineId id = PolylineId('poly');
-      Polyline polyline = Polyline(
-        polylineId: id,
-        color: Colors.blue,
-        points: coordinates,
-        width: 4,
-      );
       polylines[id] = polyline;
     });
   }
 
-  void _updateMapLocation() async {
-    final GoogleMapController controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLng(_pCurrentLocation!));
+  Future<void> updatePolylines() async {
+    List<LatLng> coordinates = await getPolylinePoints_Search();
+    generatePolylinesFromPoints(coordinates);
+
+    if (coordinates.isNotEmpty) {
+      LatLngBounds bounds = _getLatLngBounds(coordinates);
+      mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+
+      // Fetch and display the distance and duration
+      if (_pSourceLocation != null && _pDestinationLocation != null) {
+        final result = await getDistanceAndDuration(
+            _pSourceLocation!, _pDestinationLocation!);
+        setState(() {
+          distance = result['distance'];
+          duration = result['duration'];
+        });
+      }
+    }
   }
 
-  void _setMapStyle() async {
-    final GoogleMapController controller = await _mapController.future;
-    String mapStyle = await DefaultAssetBundle.of(context).loadString('assets/map_style.txt');
-    controller.setMapStyle(mapStyle);
+  LatLngBounds _getLatLngBounds(List<LatLng> coordinates) {
+    LatLng southwest = coordinates.reduce((value, element) => LatLng(
+        value.latitude < element.latitude ? value.latitude : element.latitude,
+        value.longitude < element.longitude
+            ? value.longitude
+            : element.longitude));
+    LatLng northeast = coordinates.reduce((value, element) => LatLng(
+        value.latitude > element.latitude ? value.latitude : element.latitude,
+        value.longitude > element.longitude
+            ? value.longitude
+            : element.longitude));
+    return LatLngBounds(southwest: southwest, northeast: northeast);
+  }
+
+  Future<Map<String, dynamic>> getDistanceAndDuration(
+      LatLng origin, LatLng destination) async {
+    final String url =
+        'https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.latitude},${origin.longitude}&destinations=${destination.latitude},${destination.longitude}&key=$GoogleApiKey';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(response.body);
+
+      if (data['rows'].isNotEmpty) {
+        final elements = data['rows'][0]['elements'][0];
+
+        final distanceText = elements['distance']['text'];
+        final durationText = elements['duration']['text'];
+
+        return {
+          'distance': distanceText,
+          'duration': durationText,
+        };
+      }
+    }
+    return {
+      'distance': 'N/A',
+      'duration': 'N/A',
+    };
   }
 }

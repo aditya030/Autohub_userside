@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:autohub_app/pages/home_page.dart';
 import 'package:autohub_app/pages/map_ride_price_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:autohub_app/components/const.dart';
 import 'package:autohub_app/components/location_list_tile.dart';
@@ -131,40 +133,22 @@ class _SearchPageState extends State<SearchPage> {
               children: [
                 // Top Search Bar -> Source Location and Destination Location
                 Container(
-                  width: screenWidth * 0.9,
-                  height: 98,
+                  // width: screenWidth * 0.9,
+                  // height: 98,
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundColor.withOpacity(0.9),
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(color: AppColors.primaryColor),
+                    color: Colors.blueGrey.shade50,
+                    borderRadius: const BorderRadius.all(Radius.circular(25)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 5,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                    // border: Border.all(color: AppColors.primaryColor),
                   ),
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 25),
-                        child: TextField(
-                          controller: searchPlaceController,
-                          decoration: const InputDecoration(
-                            hintText: "Search Source Location",
-                            hintStyle: TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            prefixIcon: Icon(
-                              Icons.circle,
-                              color: Colors.green,
-                              size: 15,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (value) {
-                            placeAutocomplete(value, true);
-                          },
-                        ),
-                      ),
-                      const Divider(
-                        height: 0.0,
-                      ),
                       Padding(
                         padding: const EdgeInsets.only(right: 25),
                         child: TextField(
@@ -172,11 +156,13 @@ class _SearchPageState extends State<SearchPage> {
                           decoration: const InputDecoration(
                             hintText: "Search Destination Location",
                             hintStyle: TextStyle(
-                              fontSize: 19,
+                              fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
                             prefixIcon: Icon(Icons.search_outlined,
-                                color: Colors.grey, size: 20),
+                                color: Colors.green, size: 20),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
                             border: InputBorder.none,
                           ),
                           onChanged: (value) {
@@ -248,38 +234,6 @@ class _SearchPageState extends State<SearchPage> {
                   ),
 
                 // Container to display the Current Location button
-                if (searchPlaceController.text.isEmpty && destinationPlaceController.text.isEmpty)
-                  Container(
-                    width: screenWidth * 0.5,
-                    height: screenHeight * 0.05,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        placeAutocomplete("Dubai", true);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.my_location,
-                            color: Colors.green,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Current Location",
-                            style: TextStyle(color: AppColors.backgroundColor),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 // Add the distance and duration display
                 // if (distance.isNotEmpty && duration.isNotEmpty)
                 //   Padding(
@@ -382,16 +336,20 @@ class _SearchPageState extends State<SearchPage> {
                         width: screenWidth * 0.8,
                         height: screenHeight * 0.06,
                         child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              await saveRideDetails();
                               // Navigator.pop(context, {
                               //   'duration': duration,
                               //   'distance': distance,
                               //   'sourceLocation': widget._pSourceLocation,
                               //   'destinationLocation': _pDestinationLocation,
                               // });
-                              Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => MapRidePricePage(),
-                      ),);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MapRidePricePage(),
+                                ),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
@@ -465,8 +423,8 @@ class _SearchPageState extends State<SearchPage> {
       PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
           googleApiKey: GoogleApiKey,
           request: PolylineRequest(
-              origin: PointLatLng(
-                  widget._pSourceLocation!.latitude, widget._pSourceLocation!.longitude),
+              origin: PointLatLng(widget._pSourceLocation!.latitude,
+                  widget._pSourceLocation!.longitude),
               destination: PointLatLng(_pDestinationLocation!.latitude,
                   _pDestinationLocation!.longitude),
               mode: TravelMode.driving));
@@ -523,7 +481,33 @@ class _SearchPageState extends State<SearchPage> {
             : element.longitude));
     return LatLngBounds(southwest: southwest, northeast: northeast);
   }
+  
+  Future<void> saveRideDetails() async {
+      final FirebaseAuth auth = FirebaseAuth.instance;
+      final User? user = auth.currentUser;
 
+      if (user != null &&
+          widget._pSourceLocation != null &&
+          _pDestinationLocation != null) {
+        await FirebaseFirestore.instance.collection('rides').doc(user.uid).set({
+          'source': GeoPoint(widget._pSourceLocation!.latitude,
+              widget._pSourceLocation!.longitude),
+          'destination': GeoPoint(_pDestinationLocation!.latitude,
+              _pDestinationLocation!.longitude),
+          'distance': distance,
+          'duration': duration,
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ride details saved successfully!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Unable to save ride details. Please try again.')),
+        );
+      }
+    }
   Future<Map<String, dynamic>> getDistanceAndDuration(
       LatLng origin, LatLng destination) async {
     final String url =

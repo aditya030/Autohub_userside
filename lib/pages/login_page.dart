@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
         email: email,
         password: password,
       );
-      Navigator.of(context).pushReplacementNamed("/homepage");
+      Navigator.of(context).pushReplacementNamed("/searchpage-sample");
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');

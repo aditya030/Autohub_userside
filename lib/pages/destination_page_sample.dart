@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:autohub_app/pages/home_page.dart';
 import 'package:autohub_app/pages/map_ride_price_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:autohub_app/components/const.dart';
 import 'package:autohub_app/components/location_list_tile.dart';
@@ -334,7 +336,8 @@ class _DestinationPageSampleState extends State<DestinationPageSample> {
                         width: screenWidth * 0.8,
                         height: screenHeight * 0.06,
                         child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              await saveRideDetails();
                               // Navigator.pop(context, {
                               //   'duration': duration,
                               //   'distance': distance,
@@ -478,7 +481,33 @@ class _DestinationPageSampleState extends State<DestinationPageSample> {
             : element.longitude));
     return LatLngBounds(southwest: southwest, northeast: northeast);
   }
+  
+  Future<void> saveRideDetails() async {
+      final FirebaseAuth auth = FirebaseAuth.instance;
+      final User? user = auth.currentUser;
 
+      if (user != null &&
+          widget._pSourceLocation != null &&
+          _pDestinationLocation != null) {
+        await FirebaseFirestore.instance.collection('rides').doc(user.uid).set({
+          'source': GeoPoint(widget._pSourceLocation!.latitude,
+              widget._pSourceLocation!.longitude),
+          'destination': GeoPoint(_pDestinationLocation!.latitude,
+              _pDestinationLocation!.longitude),
+          'distance': distance,
+          'duration': duration,
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ride details saved successfully!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Unable to save ride details. Please try again.')),
+        );
+      }
+    }
   Future<Map<String, dynamic>> getDistanceAndDuration(
       LatLng origin, LatLng destination) async {
     final String url =
