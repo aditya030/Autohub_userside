@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
 
   String distance = '';
   String duration = '';
-  
+
   bool isPremiumSelected = true;
 
   Future<void> placeAutocomplete(String query, bool isSource) async {
@@ -143,14 +143,16 @@ class _HomePageState extends State<HomePage> {
                         // height: 50,
                         decoration: BoxDecoration(
                           color: Colors.blueGrey.shade50,
-                          borderRadius: const BorderRadius.all(Radius.circular(30)),
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(30)),
                           // border: Border.all(color: AppColors.primaryColor),
                           boxShadow: const [
                             BoxShadow(
                               color: Colors.black26,
                               blurRadius: 5,
                               offset: Offset(0, 5),
-                            ),],
+                            ),
+                          ],
                         ),
                         child: TextField(
                           controller: searchPlaceController,
@@ -198,79 +200,68 @@ class _HomePageState extends State<HomePage> {
                 // ),
 
                 // Container to display the list of all the suggestions
-                if (searchPlaceController.text.isNotEmpty)
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: sourcePlacePredictions.length,
-                      itemBuilder: (context, index) => LocationListTile(
-                          location: sourcePlacePredictions[index].description!,
-                          press: () async {
-                            LatLng? selectedLocation = await getPlaceDetails(
-                                sourcePlacePredictions[index].placeId!);
-                            if (selectedLocation != null) {
-                              setState(() {
-                                _pSourceLocation = selectedLocation;
-                                searchPlaceController.text =
-                                    sourcePlacePredictions[index].description!;
-                                sourcePlacePredictions.clear();
-                              });
-                              mapController.animateCamera(
-                                CameraUpdate.newLatLngZoom(
-                                    selectedLocation, 15),
-                              );
-
-                              await updatePolylines();
-                            }
-                          }),
-                    ),
-                  ),
-
-                if (destinationPlaceController.text.isNotEmpty)
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: destinationPlacePredictions.length,
-                      itemBuilder: (context, index) => LocationListTile(
-                          location:
-                              destinationPlacePredictions[index].description!,
-                          press: () async {
-                            LatLng? selectedLocation = await getPlaceDetails(
-                                destinationPlacePredictions[index].placeId!);
-                            if (selectedLocation != null) {
-                              setState(() {
-                                _pDestinationLocation = selectedLocation;
-                                destinationPlaceController.text =
-                                    destinationPlacePredictions[index]
-                                        .description!;
-                                destinationPlacePredictions.clear();
-                              });
-                              mapController.animateCamera(
-                                CameraUpdate.newLatLngZoom(
-                                    selectedLocation, 15),
-                              );
-                              await updatePolylines();
-                            }
-                          }),
-                    ),
-                  ),
-
-                
-                // Add the distance and duration display
-                // if (distance.isNotEmpty && duration.isNotEmpty)
-                //   Padding(
-                //     padding: const EdgeInsets.symmetric(vertical: 10),
-                //     child: Text(
-                //       'Distance: $distance, Duration: $duration',
-                //       style: TextStyle(
-                //         fontSize: 16,
-                //         fontWeight: FontWeight.bold,
-                //       ),
-                //     ),
-                //   ),
-                // Spacer(),
               ],
             ),
           ),
-         
+          if (searchPlaceController.text.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(top: screenHeight * 0.15, left: 10, right: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  
+                  // border: Border.all(color: Colors.blueGrey.shade100),
+                ),
+                child: ListView.builder(
+                  padding: EdgeInsets.all(0),
+                  shrinkWrap: true,
+                  itemCount: sourcePlacePredictions.length,
+                  itemBuilder: (context, index) => LocationListTile(
+                      location: sourcePlacePredictions[index].description!,
+                      press: () async {
+                        LatLng? selectedLocation = await getPlaceDetails(
+                            sourcePlacePredictions[index].placeId!);
+                        if (selectedLocation != null) {
+                          setState(() {
+                            _pSourceLocation = selectedLocation;
+                            searchPlaceController.text =
+                                sourcePlacePredictions[index].description!;
+                            sourcePlacePredictions.clear();
+                          });
+                          mapController.animateCamera(
+                            CameraUpdate.newLatLngZoom(selectedLocation, 15),
+                          );
+                          await updatePolylines();
+                        }
+                      }),
+                ),
+              ),
+            ),
+          if (destinationPlaceController.text.isNotEmpty)
+            Expanded(
+              child: ListView.builder(
+                itemCount: destinationPlacePredictions.length,
+                itemBuilder: (context, index) => LocationListTile(
+                    location: destinationPlacePredictions[index].description!,
+                    press: () async {
+                      LatLng? selectedLocation = await getPlaceDetails(
+                          destinationPlacePredictions[index].placeId!);
+                      if (selectedLocation != null) {
+                        setState(() {
+                          _pDestinationLocation = selectedLocation;
+                          destinationPlaceController.text =
+                              destinationPlacePredictions[index].description!;
+                          destinationPlacePredictions.clear();
+                        });
+                        mapController.animateCamera(
+                          CameraUpdate.newLatLngZoom(selectedLocation, 15),
+                        );
+                        await updatePolylines();
+                      }
+                    }),
+              ),
+            ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
@@ -290,7 +281,6 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
                   Row(
                     children: [
                       Text(
@@ -301,28 +291,31 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(width: screenWidth * 0.34,),
-                      // Container to display the Current Location button
-                if (searchPlaceController.text.isEmpty && destinationPlaceController.text.isEmpty)
-                  Container(
-                    width: screenWidth * 0.2,
-                    height: screenHeight * 0.04,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        placeAutocomplete("Dubai", true);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey.shade50,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                      SizedBox(
+                        width: screenWidth * 0.34,
                       ),
-                      child: const Icon(Icons.my_location, color: Colors.green, size: 20),
-                    ),
-                  ),
+                      // Container to display the Current Location button
+                      if (searchPlaceController.text.isEmpty &&
+                          destinationPlaceController.text.isEmpty)
+                        Container(
+                          width: screenWidth * 0.2,
+                          height: screenHeight * 0.04,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              placeAutocomplete("Dubai", true);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blueGrey.shade50,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            child: const Icon(Icons.my_location,
+                                color: Colors.green, size: 20),
+                          ),
+                        ),
                     ],
                   ),
-                  
                   SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -368,7 +361,7 @@ class _HomePageState extends State<HomePage> {
                       // Handle Choose Destination
                       // Navigator.pop(context,{'sourceLocation': _pSourceLocation});
                       Navigator.push(
-                        context, 
+                        context,
                         MaterialPageRoute(
                           builder: (context) => SearchPage(_pSourceLocation),
                         ),
@@ -405,6 +398,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
   Widget _buildButton(String text, bool isSelected, VoidCallback onPressed) {
     return Expanded(
       child: ElevatedButton(

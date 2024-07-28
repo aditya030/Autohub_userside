@@ -174,64 +174,36 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
 
                 // Container to display the list of all the suggestions
-                if (searchPlaceController.text.isNotEmpty)
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: sourcePlacePredictions.length,
-                      itemBuilder: (context, index) => LocationListTile(
-                          location: sourcePlacePredictions[index].description!,
-                          press: () async {
-                            LatLng? selectedLocation = await getPlaceDetails(
-                                sourcePlacePredictions[index].placeId!);
-                            if (selectedLocation != null) {
-                              setState(() {
-                                widget._pSourceLocation = selectedLocation;
-                                searchPlaceController.text =
-                                    sourcePlacePredictions[index].description!;
-                                sourcePlacePredictions.clear();
-                              });
-                              mapController.animateCamera(
-                                CameraUpdate.newLatLngZoom(
-                                    selectedLocation, 15),
-                              );
+                // if (searchPlaceController.text.isNotEmpty)
+                //   Expanded(
+                //     child: ListView.builder(
+                //       itemCount: sourcePlacePredictions.length,
+                //       itemBuilder: (context, index) => LocationListTile(
+                //           location: sourcePlacePredictions[index].description!,
+                //           press: () async {
+                //             LatLng? selectedLocation = await getPlaceDetails(
+                //                 sourcePlacePredictions[index].placeId!);
+                //             if (selectedLocation != null) {
+                //               setState(() {
+                //                 widget._pSourceLocation = selectedLocation;
+                //                 searchPlaceController.text =
+                //                     sourcePlacePredictions[index].description!;
+                //                 sourcePlacePredictions.clear();
+                //               });
+                //               mapController.animateCamera(
+                //                 CameraUpdate.newLatLngZoom(
+                //                     selectedLocation, 15),
+                //               );
 
-                              await updatePolylines();
-                            }
-                          }),
-                    ),
-                  ),
-
-                if (destinationPlaceController.text.isNotEmpty)
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: destinationPlacePredictions.length,
-                      itemBuilder: (context, index) => LocationListTile(
-                          location:
-                              destinationPlacePredictions[index].description!,
-                          press: () async {
-                            LatLng? selectedLocation = await getPlaceDetails(
-                                destinationPlacePredictions[index].placeId!);
-                            if (selectedLocation != null) {
-                              setState(() {
-                                _pDestinationLocation = selectedLocation;
-                                destinationPlaceController.text =
-                                    destinationPlacePredictions[index]
-                                        .description!;
-                                destinationPlacePredictions.clear();
-                              });
-                              mapController.animateCamera(
-                                CameraUpdate.newLatLngZoom(
-                                    selectedLocation, 15),
-                              );
-                              await updatePolylines();
-                            }
-                          }),
-                    ),
-                  ),
+                //               await updatePolylines();
+                //             }
+                //           }),
+                //     ),
+                //   ),
 
                 // Container to display the Current Location button
                 // Add the distance and duration display
@@ -250,6 +222,41 @@ class _SearchPageState extends State<SearchPage> {
               ],
             ),
           ),
+          if (destinationPlaceController.text.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(
+                  top: screenHeight * 0.15, left: 10, right: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  // border: Border.all(color: Colors.blueGrey.shade100, width: 1),
+                ),
+                child: ListView.builder(
+                  padding: EdgeInsets.all(0),
+                  shrinkWrap: true,
+                  itemCount: destinationPlacePredictions.length,
+                  itemBuilder: (context, index) => LocationListTile(
+                      location: destinationPlacePredictions[index].description!,
+                      press: () async {
+                        LatLng? selectedLocation = await getPlaceDetails(
+                            destinationPlacePredictions[index].placeId!);
+                        if (selectedLocation != null) {
+                          setState(() {
+                            _pDestinationLocation = selectedLocation;
+                            destinationPlaceController.text =
+                                destinationPlacePredictions[index].description!;
+                            destinationPlacePredictions.clear();
+                          });
+                          mapController.animateCamera(
+                            CameraUpdate.newLatLngZoom(selectedLocation, 15),
+                          );
+                          await updatePolylines();
+                        }
+                      }),
+                ),
+              ),
+            ),
           if (widget._pSourceLocation != null && _pDestinationLocation != null)
             Align(
               alignment: Alignment.bottomCenter,
@@ -481,33 +488,34 @@ class _SearchPageState extends State<SearchPage> {
             : element.longitude));
     return LatLngBounds(southwest: southwest, northeast: northeast);
   }
-  
+
   Future<void> saveRideDetails() async {
-      final FirebaseAuth auth = FirebaseAuth.instance;
-      final User? user = auth.currentUser;
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final User? user = auth.currentUser;
 
-      if (user != null &&
-          widget._pSourceLocation != null &&
-          _pDestinationLocation != null) {
-        await FirebaseFirestore.instance.collection('rides').doc(user.uid).set({
-          'source': GeoPoint(widget._pSourceLocation!.latitude,
-              widget._pSourceLocation!.longitude),
-          'destination': GeoPoint(_pDestinationLocation!.latitude,
-              _pDestinationLocation!.longitude),
-          'distance': distance,
-          'duration': duration,
-        });
+    if (user != null &&
+        widget._pSourceLocation != null &&
+        _pDestinationLocation != null) {
+      await FirebaseFirestore.instance.collection('rides').doc(user.uid).set({
+        'source': GeoPoint(widget._pSourceLocation!.latitude,
+            widget._pSourceLocation!.longitude),
+        'destination': GeoPoint(
+            _pDestinationLocation!.latitude, _pDestinationLocation!.longitude),
+        'distance': distance,
+        'duration': duration,
+      });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ride details saved successfully!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Unable to save ride details. Please try again.')),
-        );
-      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ride details saved successfully!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Unable to save ride details. Please try again.')),
+      );
     }
+  }
+
   Future<Map<String, dynamic>> getDistanceAndDuration(
       LatLng origin, LatLng destination) async {
     final String url =
