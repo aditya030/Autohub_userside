@@ -93,8 +93,8 @@ class _UserBidPageState extends State<UserBidPage> {
                         padding: EdgeInsets.only(left: screenWidth * 0.05),
                         child: Row(
                           children: [
-                            Text("Mini Price: Rs 100\t\t\t"),
-                            Text("Max Price: Rs 300")
+                            Text("Mini Price: Rs 350\t\t\t"),
+                            Text("Max Price: Rs 450")
                           ],
                         ),
                       ),

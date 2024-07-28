@@ -1,5 +1,7 @@
 import 'package:autohub_app/pages/firestore_database.dart';
+import 'package:autohub_app/pages/homepage_sample.dart';
 import 'package:autohub_app/pages/sample_maps.dart';
+import 'package:autohub_app/pages/search_page_sample.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -40,12 +42,12 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/homepage',
+      initialRoute: '/searchpage-sample',
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(),
         '/homepage': (context) => HomePage(),
-        '/searchpage': (context) => SearchPage(),
+        // '/searchpage': (context) => SearchPage(),
         '/ridecompletion': (context) => RideCompletion(),
         '/Auto_details': (context) => BookingPage(),
         '/userdetails': (context) => user_details.UserDetailsPage(),
@@ -61,6 +63,8 @@ class MyApp extends StatelessWidget {
         '/rideconfirmation': (context) => RideConfirmationPage(),
         '/userbidpage': (context) => UserBidPage(),
         '/samplemap': (context) => SampleMaps(),
+        '/homepage-sample': (context) => HomepageSample(),
+        '/searchpage-sample': (context) => SearchPageSample(),
       },
     );
   }

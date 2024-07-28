@@ -250,7 +250,7 @@ class _RideCompletionState extends State<RideCompletion> {
                       width: 150,
                     ),
                     Text(
-                      "150",
+                      "450",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -268,7 +268,7 @@ class _RideCompletionState extends State<RideCompletion> {
                       ),
                     ),
                     SizedBox(
-                      width: 113,
+                      width: screenWidth*0.3,
                     ),
                     Text(
                       "- 15",
@@ -289,10 +289,10 @@ class _RideCompletionState extends State<RideCompletion> {
                       ),
                     ),
                     SizedBox(
-                      width: 215,
+                      width: screenWidth*0.52,
                     ),
                     Text(
-                      "135",
+                      "435",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -313,7 +313,7 @@ class _RideCompletionState extends State<RideCompletion> {
                 // Navigator.of(context).pushReplacementNamed("/homepage");
                 var options = {
                   'key': 'rzp_test_4ZtM3uCcmSeeED',
-                  'amount': 135*100, //in the smallest currency sub-unit.
+                  'amount': 435*100, //in the smallest currency sub-unit.
                   'name': 'Autohub',
                   // 'order_id': 'order_EMBFqjDHEEn80l', // Generate order_id using Orders API
                   'description': 'This is your total amount for the ride.',

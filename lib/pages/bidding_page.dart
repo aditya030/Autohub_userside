@@ -12,17 +12,17 @@ class _DriverListPageState extends State<DriverListPage> {
   Offset position = Offset(300, 700);
   int? selectedDriverIndex;
   Timer? _timer;
-  int _seconds = 45;
+  int _seconds = 90;
 
   final List<Map<String, dynamic>> drivers = const [
-    {'name': 'Driver 1', 'rating': 4.7, 'price': 147, 'image': 'assets/images/user2.png'},
-    {'name': 'Driver 2', 'rating': 4.2, 'price': 125, 'image': 'assets/images/user2.png'},
-    {'name': 'Driver 3', 'rating': 4.9, 'price': 177, 'image': 'assets/images/user2.png'},
-    {'name': 'Driver 4', 'rating': 3.8, 'price': 103, 'image': 'assets/images/user2.png'},
-    {'name': 'Driver 5', 'rating': 4.9, 'price': 169, 'image': 'assets/images/user2.png'},
-    {'name': 'Driver 6', 'rating': 4.0, 'price': 120, 'image': 'assets/images/user2.png'},
-    {'name': 'Driver 8', 'rating': 4.1, 'price': 132, 'image': 'assets/images/user2.png'},
-    {'name': 'Driver 9', 'rating': 3.5, 'price': 110, 'image': 'assets/images/user2.png'},
+    {'name': 'Driver 1', 'rating': 4.7, 'price': 430, 'image': 'assets/images/user2.png'},
+    {'name': 'Driver 2', 'rating': 4.2, 'price': 425, 'image': 'assets/images/user2.png'},
+    {'name': 'Driver 3', 'rating': 4.9, 'price': 470, 'image': 'assets/images/user2.png'},
+    {'name': 'Driver 4', 'rating': 3.8, 'price': 350, 'image': 'assets/images/user2.png'},
+    {'name': 'Driver 5', 'rating': 4.9, 'price': 500, 'image': 'assets/images/user2.png'},
+    {'name': 'Driver 6', 'rating': 4.0, 'price': 400, 'image': 'assets/images/user2.png'},
+    {'name': 'Driver 8', 'rating': 4.1, 'price': 390, 'image': 'assets/images/user2.png'},
+    {'name': 'Driver 9', 'rating': 3.5, 'price': 425, 'image': 'assets/images/user2.png'},
     {'name': 'Driver 10', 'rating': 4.3, 'price': 145, 'image': 'assets/images/user2.png'},
     {'name': 'Driver 11', 'rating': 4.6, 'price': 160, 'image': 'assets/images/user2.png'},
     {'name': 'Driver 12', 'rating': 4.4, 'price': 138, 'image': 'assets/images/user2.png'},
@@ -109,7 +109,7 @@ class _DriverListPageState extends State<DriverListPage> {
                           ),
                         ),
                         Text(
-                          '₹123',
+                          '₹400',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

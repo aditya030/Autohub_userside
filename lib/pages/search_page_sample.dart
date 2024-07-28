@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:autohub_app/pages/destination_page.dart';
+import 'package:autohub_app/pages/destination_page_sample.dart';
 import 'package:autohub_app/pages/home_page.dart';
 import 'package:autohub_app/pages/map_ride_price_page.dart';
+import 'package:autohub_app/pages/search_page.dart';
+import 'package:autohub_app/pages/user_details_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:autohub_app/components/const.dart';
 import 'package:autohub_app/components/location_list_tile.dart';
@@ -15,14 +19,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
-class SearchPage extends StatefulWidget {
-  LatLng? _pSourceLocation;
-  SearchPage(this._pSourceLocation);
+class SearchPageSample extends StatefulWidget {
+  const SearchPageSample({super.key});
+
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<SearchPageSample> createState() => _SearchPageSampleState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageSampleState extends State<SearchPageSample> {
   List<AutocompletePrediction> sourcePlacePredictions = [];
   List<AutocompletePrediction> destinationPlacePredictions = [];
   TextEditingController searchPlaceController = TextEditingController();
@@ -30,8 +34,7 @@ class _SearchPageState extends State<SearchPage> {
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
   LatLng? _pCurrentLocation;
-  // LatLng? widget._pSourceLocation;
-  // const SearchPage({Key? key, this.widget._pSourceLocation}) : super(key: key);
+  LatLng? _pSourceLocation;
   LatLng? _pDestinationLocation;
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylinesCoordinates = [];
@@ -40,6 +43,8 @@ class _SearchPageState extends State<SearchPage> {
 
   String distance = '';
   String duration = '';
+  
+  bool isPremiumSelected = true;
 
   Future<void> placeAutocomplete(String query, bool isSource) async {
     Uri uri =
@@ -91,7 +96,7 @@ class _SearchPageState extends State<SearchPage> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           _pCurrentLocation == null
@@ -110,11 +115,11 @@ class _SearchPageState extends State<SearchPage> {
                   initialCameraPosition:
                       CameraPosition(target: _pCurrentLocation!, zoom: 13),
                   markers: {
-                    if (widget._pSourceLocation != null)
+                    if (_pSourceLocation != null)
                       Marker(
                         markerId: MarkerId("_sourceLocation"),
                         icon: BitmapDescriptor.defaultMarkerWithHue(90),
-                        position: widget._pSourceLocation!,
+                        position: _pSourceLocation!,
                       ),
                     if (_pDestinationLocation != null)
                       Marker(
@@ -130,31 +135,38 @@ class _SearchPageState extends State<SearchPage> {
             child: Column(
               children: [
                 // Top Search Bar -> Source Location and Destination Location
-                Container(
-                  width: screenWidth * 0.9,
-                  height: 98,
-                  decoration: BoxDecoration(
-                    color: AppColors.backgroundColor.withOpacity(0.9),
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(color: AppColors.primaryColor),
-                  ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 25),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        // width: screenWidth * 0.75,
+                        // height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.blueGrey.shade50,
+                          borderRadius: const BorderRadius.all(Radius.circular(30)),
+                          // border: Border.all(color: AppColors.primaryColor),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 5,
+                              offset: Offset(0, 5),
+                            ),],
+                        ),
                         child: TextField(
                           controller: searchPlaceController,
                           decoration: const InputDecoration(
-                            hintText: "Search Source Location",
+                            hintText: "Search Location",
                             hintStyle: TextStyle(
-                              fontSize: 19,
+                              fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
                             prefixIcon: Icon(
-                              Icons.circle,
-                              color: Colors.green,
-                              size: 15,
+                              Icons.search,
+                              color: Colors.black,
+                              size: 20,
                             ),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
                             border: InputBorder.none,
                           ),
                           onChanged: (value) {
@@ -162,34 +174,28 @@ class _SearchPageState extends State<SearchPage> {
                           },
                         ),
                       ),
-                      const Divider(
-                        height: 0.0,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 25),
-                        child: TextField(
-                          controller: destinationPlaceController,
-                          decoration: const InputDecoration(
-                            hintText: "Search Destination Location",
-                            hintStyle: TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            prefixIcon: Icon(Icons.search_outlined,
-                                color: Colors.grey, size: 20),
-                            border: InputBorder.none,
+                    ),
+                    SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: () {
+                        // Navigate to UserDetailsPage
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UserDetailsPage(),
                           ),
-                          onChanged: (value) {
-                            placeAutocomplete(value, false);
-                          },
-                        ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 23,
+                        backgroundImage: AssetImage('assets/images/user2.png'),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                // const SizedBox(
+                //   height: 10,
+                // ),
 
                 // Container to display the list of all the suggestions
                 if (searchPlaceController.text.isNotEmpty)
@@ -203,7 +209,7 @@ class _SearchPageState extends State<SearchPage> {
                                 sourcePlacePredictions[index].placeId!);
                             if (selectedLocation != null) {
                               setState(() {
-                                widget._pSourceLocation = selectedLocation;
+                                _pSourceLocation = selectedLocation;
                                 searchPlaceController.text =
                                     sourcePlacePredictions[index].description!;
                                 sourcePlacePredictions.clear();
@@ -247,39 +253,7 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ),
 
-                // Container to display the Current Location button
-                if (searchPlaceController.text.isEmpty && destinationPlaceController.text.isEmpty)
-                  Container(
-                    width: screenWidth * 0.5,
-                    height: screenHeight * 0.05,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        placeAutocomplete("Dubai", true);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.my_location,
-                            color: Colors.green,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Current Location",
-                            style: TextStyle(color: AppColors.backgroundColor),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                
                 // Add the distance and duration display
                 // if (distance.isNotEmpty && duration.isNotEmpty)
                 //   Padding(
@@ -296,129 +270,176 @@ class _SearchPageState extends State<SearchPage> {
               ],
             ),
           ),
-          if (widget._pSourceLocation != null && _pDestinationLocation != null)
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: screenWidth,
-                height: screenHeight * 0.2,
-                decoration: BoxDecoration(
-                  color: AppColors.backgroundColor,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 5,
-                      offset: Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
+         
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: screenWidth,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 5,
+                    offset: Offset(0, -5),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+
+                  Row(
                     children: [
                       Text(
-                        'Ride Information',
+                        'Choose your ride',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: screenWidth * 0.1, right: screenWidth * 0.1),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: screenWidth * 0.35,
-                              height: screenHeight * 0.05,
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    )),
-                                child: Text(
-                                  "$distance",
-                                  style: TextStyle(
-                                    color: AppColors.backgroundColor,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: screenWidth * 0.05),
-                            Container(
-                              height: screenHeight * 0.05,
-                              width: screenWidth * 0.35,
-                              child: ElevatedButton(
-                                onPressed: () {},
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    )),
-                                child: Text(
-                                  "$duration",
-                                  style: TextStyle(
-                                    color: AppColors.backgroundColor,
-                                    fontSize: 15,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                      SizedBox(width: screenWidth * 0.34,),
+                      // Container to display the Current Location button
+                if (searchPlaceController.text.isEmpty && destinationPlaceController.text.isEmpty)
+                  Container(
+                    width: screenWidth * 0.2,
+                    height: screenHeight * 0.04,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        placeAutocomplete("Dubai", true);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blueGrey.shade50,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        width: screenWidth * 0.8,
-                        height: screenHeight * 0.06,
-                        child: ElevatedButton(
-                            onPressed: () {
-                              // Navigator.pop(context, {
-                              //   'duration': duration,
-                              //   'distance': distance,
-                              //   'sourceLocation': widget._pSourceLocation,
-                              //   'destinationLocation': _pDestinationLocation,
-                              // });
-                              Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => MapRidePricePage(),
-                      ),);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 50, vertical: 15),
-                            ),
-                            child: Text(
-                              "Continue",
-                              style: TextStyle(
-                                color: AppColors.backgroundColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            )),
-                      ),
-                      // SizedBox(
-                      //   height: screenHeight * 0.04,
-                      // )
+                      child: const Icon(Icons.my_location, color: Colors.green, size: 20),
+                    ),
+                  ),
                     ],
                   ),
-                ),
+                  
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildButton('Auto', !isPremiumSelected, () {
+                        setState(() {
+                          isPremiumSelected = false;
+                        });
+                      }),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      _buildButton('Premium Auto', isPremiumSelected, () {
+                        setState(() {
+                          isPremiumSelected = true;
+                        });
+                      }),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      DropdownButton<String>(
+                        value: 'Cash',
+                        items: <String>['Cash', 'UPI'].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: (_) {},
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text('Promo code'),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Handle Choose Destination
+                      // Navigator.pop(context,{'sourceLocation': _pSourceLocation});
+                      Navigator.push(
+                        context, 
+                        MaterialPageRoute(
+                          builder: (context) => DestinationPageSample(_pSourceLocation),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Choose Destination',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                        SizedBox(width: 10),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
+          ),
         ],
+      ),
+    );
+  }
+  Widget _buildButton(String text, bool isSelected, VoidCallback onPressed) {
+    return Expanded(
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: isSelected ? Colors.green : Colors.blueGrey.shade50,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          padding: EdgeInsets.symmetric(vertical: 15),
+        ),
+        child: Column(
+          children: [
+            Text(
+              text,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+              ),
+            ),
+            Text(
+              text == 'Auto' ? '2-3 person' : '4-5 person',
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+                fontSize: 12,
+              ),
+            ),
+            Text(
+              '₹ --',
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -460,13 +481,13 @@ class _SearchPageState extends State<SearchPage> {
 
   Future<List<LatLng>> getPolylinePoints_Search() async {
     List<LatLng> polylineCoordinates = [];
-    if (widget._pSourceLocation != null && _pDestinationLocation != null) {
+    if (_pSourceLocation != null && _pDestinationLocation != null) {
       PolylinePoints polylinePoints = PolylinePoints();
       PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
           googleApiKey: GoogleApiKey,
           request: PolylineRequest(
               origin: PointLatLng(
-                  widget._pSourceLocation!.latitude, widget._pSourceLocation!.longitude),
+                  _pSourceLocation!.latitude, _pSourceLocation!.longitude),
               destination: PointLatLng(_pDestinationLocation!.latitude,
                   _pDestinationLocation!.longitude),
               mode: TravelMode.driving));
@@ -499,9 +520,9 @@ class _SearchPageState extends State<SearchPage> {
       mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
 
       // Fetch and display the distance and duration
-      if (widget._pSourceLocation != null && _pDestinationLocation != null) {
+      if (_pSourceLocation != null && _pDestinationLocation != null) {
         final result = await getDistanceAndDuration(
-            widget._pSourceLocation!, _pDestinationLocation!);
+            _pSourceLocation!, _pDestinationLocation!);
         setState(() {
           distance = result['distance'];
           duration = result['duration'];

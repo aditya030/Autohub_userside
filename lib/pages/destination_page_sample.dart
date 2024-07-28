@@ -15,14 +15,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
-class SearchPage extends StatefulWidget {
+class DestinationPageSample extends StatefulWidget {
   LatLng? _pSourceLocation;
-  SearchPage(this._pSourceLocation);
+  DestinationPageSample(this._pSourceLocation);
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  State<DestinationPageSample> createState() => _DestinationPageSampleState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _DestinationPageSampleState extends State<DestinationPageSample> {
   List<AutocompletePrediction> sourcePlacePredictions = [];
   List<AutocompletePrediction> destinationPlacePredictions = [];
   TextEditingController searchPlaceController = TextEditingController();
@@ -31,7 +31,7 @@ class _SearchPageState extends State<SearchPage> {
       Completer<GoogleMapController>();
   LatLng? _pCurrentLocation;
   // LatLng? widget._pSourceLocation;
-  // const SearchPage({Key? key, this.widget._pSourceLocation}) : super(key: key);
+  // const DestinationPageSample({Key? key, this.widget._pSourceLocation}) : super(key: key);
   LatLng? _pDestinationLocation;
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylinesCoordinates = [];
@@ -131,40 +131,22 @@ class _SearchPageState extends State<SearchPage> {
               children: [
                 // Top Search Bar -> Source Location and Destination Location
                 Container(
-                  width: screenWidth * 0.9,
-                  height: 98,
+                  // width: screenWidth * 0.9,
+                  // height: 98,
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundColor.withOpacity(0.9),
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    border: Border.all(color: AppColors.primaryColor),
+                    color: Colors.blueGrey.shade50,
+                    borderRadius: const BorderRadius.all(Radius.circular(25)),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 5,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                    // border: Border.all(color: AppColors.primaryColor),
                   ),
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(right: 25),
-                        child: TextField(
-                          controller: searchPlaceController,
-                          decoration: const InputDecoration(
-                            hintText: "Search Source Location",
-                            hintStyle: TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            prefixIcon: Icon(
-                              Icons.circle,
-                              color: Colors.green,
-                              size: 15,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          onChanged: (value) {
-                            placeAutocomplete(value, true);
-                          },
-                        ),
-                      ),
-                      const Divider(
-                        height: 0.0,
-                      ),
                       Padding(
                         padding: const EdgeInsets.only(right: 25),
                         child: TextField(
@@ -172,11 +154,13 @@ class _SearchPageState extends State<SearchPage> {
                           decoration: const InputDecoration(
                             hintText: "Search Destination Location",
                             hintStyle: TextStyle(
-                              fontSize: 19,
+                              fontSize: 18,
                               fontWeight: FontWeight.w500,
                             ),
                             prefixIcon: Icon(Icons.search_outlined,
-                                color: Colors.grey, size: 20),
+                                color: Colors.green, size: 20),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
                             border: InputBorder.none,
                           ),
                           onChanged: (value) {
@@ -248,38 +232,6 @@ class _SearchPageState extends State<SearchPage> {
                   ),
 
                 // Container to display the Current Location button
-                if (searchPlaceController.text.isEmpty && destinationPlaceController.text.isEmpty)
-                  Container(
-                    width: screenWidth * 0.5,
-                    height: screenHeight * 0.05,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        placeAutocomplete("Dubai", true);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.my_location,
-                            color: Colors.green,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "Current Location",
-                            style: TextStyle(color: AppColors.backgroundColor),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 // Add the distance and duration display
                 // if (distance.isNotEmpty && duration.isNotEmpty)
                 //   Padding(
@@ -389,9 +341,12 @@ class _SearchPageState extends State<SearchPage> {
                               //   'sourceLocation': widget._pSourceLocation,
                               //   'destinationLocation': _pDestinationLocation,
                               // });
-                              Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => MapRidePricePage(),
-                      ),);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MapRidePricePage(),
+                                ),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
@@ -465,8 +420,8 @@ class _SearchPageState extends State<SearchPage> {
       PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
           googleApiKey: GoogleApiKey,
           request: PolylineRequest(
-              origin: PointLatLng(
-                  widget._pSourceLocation!.latitude, widget._pSourceLocation!.longitude),
+              origin: PointLatLng(widget._pSourceLocation!.latitude,
+                  widget._pSourceLocation!.longitude),
               destination: PointLatLng(_pDestinationLocation!.latitude,
                   _pDestinationLocation!.longitude),
               mode: TravelMode.driving));

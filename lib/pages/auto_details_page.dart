@@ -231,7 +231,7 @@ class _BookingPageState extends State<BookingPage> {
                               ),
                             ),
                             Text(
-                              "₹150",
+                              "₹350",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -268,7 +268,7 @@ class _BookingPageState extends State<BookingPage> {
                             Icon(Icons.cancel, color: Colors.white),
                             SizedBox(width: 10),
                             Text(
-                              "Cancel Your Booking",
+                              "Complete Your Ride",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,

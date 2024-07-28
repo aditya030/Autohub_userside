@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SearchPage(), // Ensure SearchPage is implemented
+                            builder: (context) => DestinationPage(), // Ensure SearchPage is implemented
                           ),
                         );
                       },
@@ -181,6 +181,7 @@ class _HomePageState extends State<HomePage> {
                           isPremiumSelected = false;
                         });
                       }),
+                      SizedBox(width: 10,),
                       _buildButton('Premium Auto', isPremiumSelected, () {
                         setState(() {
                           isPremiumSelected = true;

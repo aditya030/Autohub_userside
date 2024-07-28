@@ -77,7 +77,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                   Divider(height: 0.0, color: Colors.black),
                   TextField(
                     decoration: InputDecoration(
-                      hintText: "Katpadi railway station",
+                      hintText: "CMC Ranipet Campus",
                       hintStyle: TextStyle(
                         fontSize: 19,
                         fontWeight: FontWeight.w400,
@@ -169,7 +169,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                           ),
                           Spacer(),
                           Text(
-                            "₹ 120",
+                            "₹ 350",
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
@@ -225,7 +225,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                           ),
                           Spacer(),
                           Text(
-                            "₹ 150",
+                            "₹ 400",
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
@@ -263,7 +263,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                           ),
                           Spacer(),
                           Text(
-                            isPremiumSelected ? "₹ 150" : "₹ 120",
+                            isPremiumSelected ? "₹ 400" : "₹ 350",
                             style: TextStyle(
                               color: AppColors.backgroundColor,
                               fontSize: 18,
