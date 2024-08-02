@@ -12,6 +12,9 @@ class MapRidePricePage extends StatefulWidget {
   String distance;
   MapRidePricePage(this._pSourceLocation, this._pDestinationLocation, this.distance);
   // MapRidePricePage(this.distance);
+  // final String distance;
+  // const MapRidePricePage({Key? key, required this.distance}) : super(key: key);
+
   @override
   State<MapRidePricePage> createState() => _MapRidePricePageState();
 }
@@ -26,6 +29,24 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
   List<LatLng> polylinesCoordinates = [];
   late GoogleMapController mapController;
   Location _locationController = Location();
+  late double distanceInKm;
+  double autoPrice = 0.0;
+  double premiumPrice = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    distanceInKm = double.tryParse(widget.distance.split(' ')[0]) ?? 0.0;
+    calculatePrices();
+  }
+
+  void calculatePrices() {
+    setState(() {
+      autoPrice = distanceInKm * 10.0; // Rate for Auto
+      premiumPrice = distanceInKm * 12.0; // Rate for Premium Auto
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -159,9 +180,9 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(0),
                         ),
-                        backgroundColor: isPremiumSelected
-                            ? AppColors.offwhite
-                            : Color(0xff70D94C),
+                        backgroundColor: !isPremiumSelected
+                            ? Color(0xff70D94C)
+                            : AppColors.offwhite,
                       ),
                       child: Row(
                         children: [
@@ -191,7 +212,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                           ),
                           Spacer(),
                           Text(
-                            "₹ 350",
+                            "₹ ${autoPrice.toStringAsFixed(2)}",
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
@@ -247,7 +268,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                           ),
                           Spacer(),
                           Text(
-                            "₹ 400",
+                            "₹ ${premiumPrice.toStringAsFixed(2)}",
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w600,
@@ -285,7 +306,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                           ),
                           Spacer(),
                           Text(
-                            isPremiumSelected ? "₹ 400" : "₹ 350",
+                            "₹ ${isPremiumSelected ? premiumPrice : autoPrice.toStringAsFixed(2)}",
                             style: TextStyle(
                               color: AppColors.backgroundColor,
                               fontSize: 18,

@@ -354,6 +354,7 @@ class _SearchPageState extends State<SearchPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => MapRidePricePage(widget._pLocation, _pDestinationLocation, distance),
+                                  // builder: (context) => MapRidePricePage(distance:distance),
                                 ),
                               );
                             },

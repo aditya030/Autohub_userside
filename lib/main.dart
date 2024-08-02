@@ -49,6 +49,12 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginPage(),
         '/ride': (context) => MapRidePricePage(_pSource, _pSource, distance),
+        // routes: {
+        //   '/': (context) => LoginPage(),
+        //   '/ride': (context) {
+        //     final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+        //     return MapRidePricePage(distance: args['distance']);
+        //   },
         '/homepage': (context) => HomePage(),
         '/searchpage': (context) => SearchPage(_pSource,_pSource),
         '/ridecompletion': (context) => RideCompletion(),
