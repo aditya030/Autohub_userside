@@ -1,18 +1,31 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:autohub_app/components/const.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:autohub_app/styles/app_colors.dart';
-
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 class MapRidePricePage extends StatefulWidget {
-  const MapRidePricePage({Key? key}) : super(key: key);
-
+  LatLng? _pSourceLocation;
+  LatLng? _pDestinationLocation;
+  String distance;
+  MapRidePricePage(this._pSourceLocation, this._pDestinationLocation, this.distance);
+  // MapRidePricePage(this.distance);
   @override
   State<MapRidePricePage> createState() => _MapRidePricePageState();
 }
 
 class _MapRidePricePageState extends State<MapRidePricePage> {
   bool isPremiumSelected = true;
-
+  final Completer<GoogleMapController> _mapController =
+      Completer<GoogleMapController>();
+  LatLng? _pCurrentLocation;
+  LatLng? _pDestinationLocation;
+  Map<PolylineId, Polyline> polylines = {};
+  List<LatLng> polylinesCoordinates = [];
+  late GoogleMapController mapController;
+  Location _locationController = Location();
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -23,29 +36,38 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
       backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
-          FlutterMap(
-            options: MapOptions(
-              initialCenter: LatLng(12.9692, 79.1559),
-              initialZoom: 15,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'dev.vit.vellore',
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: LatLng(12.9692, 79.1559),
-                    child: Icon(
-                      Icons.location_on,
-                      color: Colors.green,
-                    ),
+          (widget._pSourceLocation == null && widget._pDestinationLocation == null)
+            ? Center(
+                  child: Image.asset(
+                    'assets/icons/loading_animation.gif',
+                    width: screenHeight * 0.3,
                   ),
-                ],
-              ),
-            ],
-          ),
+                )
+              : GoogleMap(
+                  onMapCreated: ((GoogleMapController controller) {
+                    _mapController.complete(controller);
+                    mapController = controller;
+                  }),
+                  mapType: MapType.normal,
+                  initialCameraPosition:
+                      CameraPosition(target: widget._pSourceLocation!, zoom: 13),
+                  markers: {
+                    if (widget._pSourceLocation != null)
+                      Marker(
+                        markerId: MarkerId("_sourceLocation"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                        position: widget._pSourceLocation!,
+                      ),
+                    if (_pDestinationLocation != null)
+                      Marker(
+                        markerId: MarkerId("_destinationLocation"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                        position: _pDestinationLocation!,
+                      ),
+                  },
+                  polylines: Set<Polyline>.of(polylines.values),
+                ), 
+
           Positioned(
             top: 50.0,
             left: 15.0,
@@ -292,4 +314,104 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
       ),
     );
   }
+  Future<void> getLocationUpdates() async {
+    bool _serviceEnabled;
+    PermissionStatus _locationPermissionGranted;
+
+    // If Location is disabled send a prompt saying to turn on the location.
+    _serviceEnabled = await _locationController.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await _locationController.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _locationPermissionGranted = await _locationController.hasPermission();
+    if (_locationPermissionGranted == PermissionStatus.denied) {
+      _locationPermissionGranted =
+          await _locationController.requestPermission();
+      if (_locationPermissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _locationController.onLocationChanged
+        .listen((LocationData currentLocation) {
+      if (currentLocation.latitude != null &&
+          currentLocation.longitude != null) {
+        setState(() {
+          _pCurrentLocation =
+              LatLng(currentLocation.latitude!, currentLocation.longitude!);
+          print("Current Position: $currentLocation");
+        });
+      }
+    });
+  }
+
+  Future<List<LatLng>> getPolylinePoints_Search() async {
+    List<LatLng> polylineCoordinates = [];
+    if (widget._pSourceLocation != null && _pDestinationLocation != null) {
+      PolylinePoints polylinePoints = PolylinePoints();
+      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+          googleApiKey: GoogleApiKey,
+          request: PolylineRequest(
+              origin: PointLatLng(widget._pSourceLocation!.latitude,
+                  widget._pSourceLocation!.longitude),
+              destination: PointLatLng(_pDestinationLocation!.latitude,
+                  _pDestinationLocation!.longitude),
+              mode: TravelMode.driving));
+      if (result.points.isNotEmpty) {
+        result.points.forEach((PointLatLng point) {
+          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+        });
+      } else {
+        print(result.errorMessage);
+      }
+    }
+    return polylineCoordinates;
+  }
+
+  generatePolylinesFromPoints(List<LatLng> coordinates) {
+    PolylineId id = PolylineId("poly");
+    Polyline polyline = Polyline(
+        polylineId: id, color: Colors.green, points: coordinates, width: 5);
+    setState(() {
+      polylines[id] = polyline;
+    });
+  }
+  LatLngBounds _getLatLngBounds(List<LatLng> coordinates) {
+    LatLng southwest = coordinates.reduce((value, element) => LatLng(
+        value.latitude < element.latitude ? value.latitude : element.latitude,
+        value.longitude < element.longitude
+            ? value.longitude
+            : element.longitude));
+    LatLng northeast = coordinates.reduce((value, element) => LatLng(
+        value.latitude > element.latitude ? value.latitude : element.latitude,
+        value.longitude > element.longitude
+            ? value.longitude
+            : element.longitude));
+    return LatLngBounds(southwest: southwest, northeast: northeast);
+  }
+
+  Future<void> updatePolylines() async {
+    List<LatLng> coordinates = await getPolylinePoints_Search();
+    generatePolylinesFromPoints(coordinates);
+
+    if (coordinates.isNotEmpty) {
+      LatLngBounds bounds = _getLatLngBounds(coordinates);
+      mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
+
+      // Fetch and display the distance and duration
+      // if (widget._pSourceLocation != null && _pDestinationLocation != null) {
+      //   final result = await getDistanceAndDuration(
+      //       widget._pSourceLocation!, _pDestinationLocation!);
+      //   setState(() {
+      //     distance = result['distance'];
+      //     duration = result['duration'];
+      //   });
+      // }
+    }
+  }
+
 }

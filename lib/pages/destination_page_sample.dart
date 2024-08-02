@@ -338,18 +338,12 @@ class _DestinationPageSampleState extends State<DestinationPageSample> {
                         child: ElevatedButton(
                             onPressed: () async {
                               await saveRideDetails();
-                              // Navigator.pop(context, {
-                              //   'duration': duration,
-                              //   'distance': distance,
-                              //   'sourceLocation': widget._pSourceLocation,
-                              //   'destinationLocation': _pDestinationLocation,
-                              // });
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MapRidePricePage(),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => MapRidePricePage(distance),
+                              //   ),
+                              // );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,

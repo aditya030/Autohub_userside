@@ -1,6 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'dart:math';
+import 'package:autohub_app/pages/destination_page.dart';
+import 'package:autohub_app/pages/destination_page_sample.dart';
+import 'package:autohub_app/pages/home_page.dart';
+import 'package:autohub_app/pages/map_ride_price_page.dart';
+import 'package:autohub_app/pages/search_page.dart';
+import 'package:autohub_app/pages/user_details_page.dart';
 import 'package:http/http.dart' as http;
 import 'package:autohub_app/components/const.dart';
 import 'package:autohub_app/components/location_list_tile.dart';
@@ -8,43 +14,39 @@ import 'package:autohub_app/components/network_utility.dart';
 import 'package:autohub_app/models/autocomplete_prediction.dart';
 import 'package:autohub_app/models/place_auto_complete_response.dart';
 import 'package:autohub_app/models/place_details_response.dart';
-import 'package:autohub_app/pages/destination_page.dart';
-import 'package:autohub_app/pages/search_page.dart';
-import 'package:autohub_app/pages/user_details_page.dart';
 import 'package:autohub_app/styles/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
-class HomepageSample extends StatefulWidget {
-  const HomepageSample({super.key});
+class HomePageSample extends StatefulWidget {
+  const HomePageSample({super.key});
 
   @override
-  State<HomepageSample> createState() => _HomepageSampleState();
+  State<HomePageSample> createState() => _HomePageSampleState();
 }
 
-class _HomepageSampleState extends State<HomepageSample> {
-  // All the data variables and controllers
+class _HomePageSampleState extends State<HomePageSample> {
   List<AutocompletePrediction> sourcePlacePredictions = [];
   List<AutocompletePrediction> destinationPlacePredictions = [];
   TextEditingController searchPlaceController = TextEditingController();
   TextEditingController destinationPlaceController = TextEditingController();
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
-  Location _locationController = Location();
-  late GoogleMapController mapController;
-  Map<PolylineId, Polyline> polylines = {};
   LatLng? _pCurrentLocation;
-  bool isPremiumSelected = true;
-  String distance = '';
-  String duration = '';
   LatLng? _pSourceLocation;
   LatLng? _pDestinationLocation;
+  Map<PolylineId, Polyline> polylines = {};
+  List<LatLng> polylinesCoordinates = [];
+  late GoogleMapController mapController;
+  Location _locationController = Location();
 
-  // static LatLng _pSource = LatLng(12.9692, 79.1559);
-  // static LatLng _pDestination = LatLng(12.9244, 79.1353);
+  String distance = '';
+  String duration = '';
 
-  // Autocomplete recommendations for Search bar
+  bool isPremiumSelected = true;
+
   Future<void> placeAutocomplete(String query, bool isSource) async {
     Uri uri =
         Uri.https("maps.googleapis.com", "maps/api/place/autocomplete/json", {
@@ -67,7 +69,6 @@ class _HomepageSampleState extends State<HomepageSample> {
     }
   }
 
-  // To get the place details i.e., Latitude and Longitude details.
   Future<LatLng?> getPlaceDetails(String placeId) async {
     Uri uri = Uri.https("maps.googleapis.com", "maps/api/place/details/json", {
       "place_id": placeId,
@@ -85,29 +86,35 @@ class _HomepageSampleState extends State<HomepageSample> {
     return null;
   }
 
+  Future<String> getPlaceName(LatLng location) async {
+    Uri uri = Uri.https("maps.googleapis.com", "maps/api/geocode/json", {
+      "latlng": "${location.latitude},${location.longitude}",
+      "key": GoogleApiKey,
+    });
+    String? response = await NetworkUtility.fetchUrl(uri);
+    if (response != null) {
+      final data = jsonDecode(response);
+      if (data["results"] != null && data["results"].isNotEmpty) {
+        return data["results"][0]["formatted_address"];
+      }
+    }
+    return "";
+  }
+
   @override
   void initState() {
     super.initState();
     getLocationUpdates();
-    // getLocationUpdates().then((_) => {
-    //       getPolylinePoints().then((coordinates) => {
-    //             // print(coordinates),
-    //             generatePolylinesFromPoints(coordinates),
-    //           }),
-    //     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Screen Dimensions - MediaQuery
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
-          // If LOCATION is ON and the app has the permission then Map will be displayed otherwise Animation will be played.
           _pCurrentLocation == null
               ? Center(
                   child: Image.asset(
@@ -116,50 +123,46 @@ class _HomepageSampleState extends State<HomepageSample> {
                   ),
                 )
               : GoogleMap(
-                  onMapCreated: (GoogleMapController controller) {
+                  onMapCreated: ((GoogleMapController controller) {
                     _mapController.complete(controller);
-                    // _setMapStyle();
-                  },
+                    mapController = controller;
+                  }),
                   mapType: MapType.normal,
                   initialCameraPosition:
                       CameraPosition(target: _pCurrentLocation!, zoom: 13),
                   markers: {
-                    // Marker will show the current location
-                    // if(_pSourceLocation == null)
-                    // Marker(
-                    //     markerId: MarkerId("_currentLocation"),
-                    //     icon: BitmapDescriptor.defaultMarkerWithHue(90),
-                    //     position: _pCurrentLocation!),
                     if (_pSourceLocation != null)
                       Marker(
                         markerId: MarkerId("_sourceLocation"),
                         icon: BitmapDescriptor.defaultMarkerWithHue(90),
                         position: _pSourceLocation!,
                       ),
-                    // Marker(
-                    //     markerId: MarkerId("_destionationLocation"),
-                    //     icon: BitmapDescriptor.defaultMarker,
-                    //     position: _pDestination),
+                    if (_pDestinationLocation != null)
+                      Marker(
+                        markerId: MarkerId("_destinationLocation"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                        position: _pDestinationLocation!,
+                      ),
                   },
                   polylines: Set<Polyline>.of(polylines.values),
                 ),
-          Positioned(
-            top: 50,
-            left: 15,
-            right: 15,
+          Padding(
+            padding: const EdgeInsets.only(top: 50, left: 15, right: 15),
             child: Column(
               children: [
+                // Top Search Bar -> Source Location and Destination Location
                 Row(
                   children: [
                     Expanded(
                       child: Container(
+                        // width: screenWidth * 0.75,
+                        // height: 50,
                         decoration: BoxDecoration(
                           color: Colors.blueGrey.shade50,
-                          borderRadius: BorderRadius.circular(30),
-                          // border: Border.all(
-                          //   // color: Colors.black,
-                          // ),
-                          boxShadow: [
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(30)),
+                          // border: Border.all(color: AppColors.primaryColor),
+                          boxShadow: const [
                             BoxShadow(
                               color: Colors.black26,
                               blurRadius: 5,
@@ -169,31 +172,23 @@ class _HomepageSampleState extends State<HomepageSample> {
                         ),
                         child: TextField(
                           controller: searchPlaceController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: 'Search Location',
+                          decoration: const InputDecoration(
+                            hintText: "Search Location",
                             hintStyle: TextStyle(
-                                color: AppColors.primaryColor, fontSize: 18),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
                             prefixIcon: Icon(
                               Icons.search,
-                              color: AppColors.primaryColor,
+                              color: Colors.black,
+                              size: 20,
                             ),
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 15),
+                            border: InputBorder.none,
                           ),
                           onChanged: (value) {
-                            // Handle text change
                             placeAutocomplete(value, true);
-                          },
-                          onTap: () {
-                            // Navigate to search page
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) =>
-                            //         SearchPage(), // Ensure SearchPage is implemented
-                            //   ),
-                            // );
                           },
                         ),
                       ),
@@ -216,51 +211,28 @@ class _HomepageSampleState extends State<HomepageSample> {
                     ),
                   ],
                 ),
-                SizedBox(
-                  height: 10,
-                ),
-                if (searchPlaceController.text.isEmpty)
-                  Container(
-                    width: screenWidth * 0.40,
-                    height: screenHeight * 0.04,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        placeAutocomplete("Dubai", true);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.my_location,
-                            color: Colors.green,
-                            size: 15,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            "Current Location",
-                            style: TextStyle(
-                                color: AppColors.backgroundColor, fontSize: 12),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                // const SizedBox(
+                //   height: 10,
+                // ),
+
+                // Container to display the list of all the suggestions
               ],
             ),
           ),
           if (searchPlaceController.text.isNotEmpty)
             Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.1),
-              child: Expanded(
+              padding: EdgeInsets.only(
+                  top: screenHeight * 0.15, left: 10, right: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+
+                  // border: Border.all(color: Colors.blueGrey.shade100),
+                ),
                 child: ListView.builder(
+                  padding: EdgeInsets.all(0),
+                  shrinkWrap: true,
                   itemCount: sourcePlacePredictions.length,
                   itemBuilder: (context, index) => LocationListTile(
                       location: sourcePlacePredictions[index].description!,
@@ -277,114 +249,85 @@ class _HomepageSampleState extends State<HomepageSample> {
                           mapController.animateCamera(
                             CameraUpdate.newLatLngZoom(selectedLocation, 15),
                           );
-              
                           await updatePolylines();
                         }
                       }),
                 ),
               ),
             ),
+          if (destinationPlaceController.text.isNotEmpty)
+            Expanded(
+              child: ListView.builder(
+                itemCount: destinationPlacePredictions.length,
+                itemBuilder: (context, index) => LocationListTile(
+                    location: destinationPlacePredictions[index].description!,
+                    press: () async {
+                      LatLng? selectedLocation = await getPlaceDetails(
+                          destinationPlacePredictions[index].placeId!);
+                      if (selectedLocation != null) {
+                        setState(() {
+                          _pDestinationLocation = selectedLocation;
+                          destinationPlaceController.text =
+                              destinationPlacePredictions[index].description!;
+                          destinationPlacePredictions.clear();
+                        });
+                        mapController.animateCamera(
+                          CameraUpdate.newLatLngZoom(selectedLocation, 15),
+                        );
+                        await updatePolylines();
+                      }
+                    }),
+              ),
+            ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: EdgeInsets.only(bottom: screenHeight * 0.3, right: 10),
+              child: FloatingActionButton(
+                onPressed: () async {
+                  LocationData currentLocation =
+                      await _locationController.getLocation();
+                  LatLng currentLatLng = LatLng(currentLocation.latitude!,
+                      currentLocation.longitude!);
+                  String placeName = await getPlaceName(currentLatLng);
+                  setState(() {
+                    _pSourceLocation = currentLatLng;
+                    searchPlaceController.text = placeName;
+                  });
+                  mapController.animateCamera(
+                    CameraUpdate.newLatLngZoom(currentLatLng, 15),
+                  );
+                },
+                child: const Icon(Icons.my_location),
+              ),
+            ),
+          ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              width: screenWidth,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 5,
-                    offset: Offset(0, -5),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Choose your ride',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildButton('Auto', !isPremiumSelected, () {
-                        setState(() {
-                          isPremiumSelected = false;
-                        });
-                      }),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      _buildButton('Premium Auto', isPremiumSelected, () {
-                        setState(() {
-                          isPremiumSelected = true;
-                        });
-                      }),
-                    ],
+                  onPressed: () {
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => MapRidePricePage(distance),
+                    //   ),
+                    // );
+                  },
+                  child: const Text(
+                    'Request a Ride',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      DropdownButton<String>(
-                        value: 'Cash',
-                        items: <String>['Cash', 'UPI'].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: (_) {},
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text('Promo code'),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Handle Choose Destination
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DestinationPage(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Choose Destination',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                        SizedBox(width: 10),
-                        Icon(
-                          Icons.arrow_forward,
-                          color: Colors.white,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
@@ -393,176 +336,69 @@ class _HomepageSampleState extends State<HomepageSample> {
     );
   }
 
-  Widget _buildButton(String text, bool isSelected, VoidCallback onPressed) {
-    return Expanded(
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected ? Colors.green : Colors.blueGrey.shade50,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          padding: EdgeInsets.symmetric(vertical: 15),
+  void getLocationUpdates() async {
+    _locationController.onLocationChanged.listen((l) {
+      _pCurrentLocation = LatLng(l.latitude!, l.longitude!);
+      mapController.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: _pCurrentLocation!, zoom: 13),
         ),
-        child: Column(
-          children: [
-            Text(
-              text,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-              ),
-            ),
-            Text(
-              text == 'Auto' ? '2-3 person' : '4-5 person',
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontSize: 12,
-              ),
-            ),
-            Text(
-              '₹ --',
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _updateMapLocation() async {
-    final GoogleMapController controller = await _mapController.future;
-    controller.animateCamera(CameraUpdate.newLatLng(_pCurrentLocation!));
-  }
-
-  Future<void> getLocationUpdates() async {
-    bool _serviceEnabled;
-    PermissionStatus _locationPermissionGranted;
-
-    // If Location is disabled send a prompt saying to turn on the location.
-    _serviceEnabled = await _locationController.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await _locationController.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-
-    _locationPermissionGranted = await _locationController.hasPermission();
-    if (_locationPermissionGranted == PermissionStatus.denied) {
-      _locationPermissionGranted =
-          await _locationController.requestPermission();
-      if (_locationPermissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _locationController.onLocationChanged
-        .listen((LocationData currentLocation) {
-      if (currentLocation.latitude != null &&
-          currentLocation.longitude != null) {
-        setState(() {
-          _pCurrentLocation =
-              LatLng(currentLocation.latitude!, currentLocation.longitude!);
-          print("Current Position: $currentLocation");
-        });
-      }
+      );
+      setState(() {});
     });
   }
 
-  Future<List<LatLng>> getPolylinePoints_Search() async {
-    List<LatLng> polylineCoordinates = [];
+  Future<void> updatePolylines() async {
     if (_pSourceLocation != null && _pDestinationLocation != null) {
       PolylinePoints polylinePoints = PolylinePoints();
       PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
           googleApiKey: GoogleApiKey,
           request: PolylineRequest(
-              origin: PointLatLng(
-                  _pSourceLocation!.latitude, _pSourceLocation!.longitude),
+              origin: PointLatLng(_pSourceLocation!.latitude,
+                  _pSourceLocation!.longitude),
               destination: PointLatLng(_pDestinationLocation!.latitude,
                   _pDestinationLocation!.longitude),
               mode: TravelMode.driving));
       if (result.points.isNotEmpty) {
+        polylinesCoordinates.clear();
         result.points.forEach((PointLatLng point) {
-          polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+          polylinesCoordinates.add(LatLng(point.latitude, point.longitude));
+        });
+        PolylineId id = PolylineId('poly');
+        Polyline polyline = Polyline(
+          polylineId: id,
+          color: Colors.blue,
+          points: polylinesCoordinates,
+          width: 8,
+        );
+        polylines[id] = polyline;
+
+        double totalDistance = 0;
+        for (int i = 0; i < polylinesCoordinates.length - 1; i++) {
+          totalDistance += calculateDistance(
+            polylinesCoordinates[i].latitude,
+            polylinesCoordinates[i].longitude,
+            polylinesCoordinates[i + 1].latitude,
+            polylinesCoordinates[i + 1].longitude,
+          );
+        }
+        setState(() {
+          distance = totalDistance.toStringAsFixed(2);
+          duration = (totalDistance / 50).toStringAsFixed(2);
         });
       } else {
-        print(result.errorMessage);
+        polylines.clear();
       }
-    }
-    return polylineCoordinates;
-  }
-
-  generatePolylinesFromPoints(List<LatLng> coordinates) {
-    PolylineId id = PolylineId("poly");
-    Polyline polyline = Polyline(
-        polylineId: id, color: Colors.green, points: coordinates, width: 5);
-    setState(() {
-      polylines[id] = polyline;
-    });
-  }
-
-  Future<void> updatePolylines() async {
-    List<LatLng> coordinates = await getPolylinePoints_Search();
-    generatePolylinesFromPoints(coordinates);
-
-    if (coordinates.isNotEmpty) {
-      LatLngBounds bounds = _getLatLngBounds(coordinates);
-      mapController.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
-
-      // Fetch and display the distance and duration
-      if (_pSourceLocation != null && _pDestinationLocation != null) {
-        final result = await getDistanceAndDuration(
-            _pSourceLocation!, _pDestinationLocation!);
-        setState(() {
-          distance = result['distance'];
-          duration = result['duration'];
-        });
-      }
+      setState(() {});
     }
   }
 
-  LatLngBounds _getLatLngBounds(List<LatLng> coordinates) {
-    LatLng southwest = coordinates.reduce((value, element) => LatLng(
-        value.latitude < element.latitude ? value.latitude : element.latitude,
-        value.longitude < element.longitude
-            ? value.longitude
-            : element.longitude));
-    LatLng northeast = coordinates.reduce((value, element) => LatLng(
-        value.latitude > element.latitude ? value.latitude : element.latitude,
-        value.longitude > element.longitude
-            ? value.longitude
-            : element.longitude));
-    return LatLngBounds(southwest: southwest, northeast: northeast);
-  }
-
-  Future<Map<String, dynamic>> getDistanceAndDuration(
-      LatLng origin, LatLng destination) async {
-    final String url =
-        'https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin.latitude},${origin.longitude}&destinations=${destination.latitude},${destination.longitude}&key=$GoogleApiKey';
-
-    final response = await http.get(Uri.parse(url));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-
-      if (data['rows'].isNotEmpty) {
-        final elements = data['rows'][0]['elements'][0];
-
-        final distanceText = elements['distance']['text'];
-        final durationText = elements['duration']['text'];
-
-        return {
-          'distance': distanceText,
-          'duration': durationText,
-        };
-      }
-    }
-    return {
-      'distance': 'N/A',
-      'duration': 'N/A',
-    };
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    const p = 0.017453292519943295;
+    const c = 0.0033122705099; // Adjusted for better precision
+    final a = 0.5 -
+        cos((lat2 - lat1) * p) / 2 +
+        cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
   }
 }

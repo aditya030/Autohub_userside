@@ -85,6 +85,21 @@ class _HomePageState extends State<HomePage> {
     return null;
   }
 
+  Future<String> getPlaceName(LatLng location) async {
+    Uri uri = Uri.https("maps.googleapis.com", "maps/api/geocode/json", {
+      "latlng": "${location.latitude},${location.longitude}",
+      "key": GoogleApiKey,
+    });
+    String? response = await NetworkUtility.fetchUrl(uri);
+    if (response != null) {
+      final data = jsonDecode(response);
+      if (data["results"] != null && data["results"].isNotEmpty) {
+        return data["results"][0]["formatted_address"];
+      }
+    }
+    return "";
+  }
+
   @override
   void initState() {
     super.initState();
@@ -195,9 +210,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-                // const SizedBox(
-                //   height: 10,
-                // ),
 
                 // Container to display the list of all the suggestions
               ],
@@ -205,12 +217,13 @@ class _HomePageState extends State<HomePage> {
           ),
           if (searchPlaceController.text.isNotEmpty)
             Padding(
-              padding: EdgeInsets.only(top: screenHeight * 0.15, left: 10, right: 10),
+              padding: EdgeInsets.only(
+                  top: screenHeight * 0.15, left: 10, right: 10),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(25),
-                  
+
                   // border: Border.all(color: Colors.blueGrey.shade100),
                 ),
                 child: ListView.builder(
@@ -282,6 +295,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Choose your ride',
@@ -291,27 +305,41 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(
-                        width: screenWidth * 0.34,
-                      ),
+                      // SizedBox(
+                      //   width: screenWidth * 0.34,
+                      // ),
                       // Container to display the Current Location button
                       if (searchPlaceController.text.isEmpty &&
                           destinationPlaceController.text.isEmpty)
                         Container(
-                          width: screenWidth * 0.2,
+                          // width: screenWidth * 0.2,
                           height: screenHeight * 0.04,
                           child: ElevatedButton(
-                            onPressed: () {
-                              placeAutocomplete("Dubai", true);
+                            onPressed: () async {
+                              LocationData currentLocation =
+                                  await _locationController.getLocation();
+                              LatLng currentLatLng = LatLng(
+                                  currentLocation.latitude!,
+                                  currentLocation.longitude!);
+                              String placeName =
+                                  await getPlaceName(currentLatLng);
+                              setState(() {
+                                _pSourceLocation = currentLatLng;
+                                searchPlaceController.text = placeName;
+                              });
+                              mapController.animateCamera(
+                                CameraUpdate.newLatLngZoom(currentLatLng, 15),
+                              );
                             },
+                            child: const Icon(Icons.my_location, color: AppColors.primaryColor,),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blueGrey.shade50,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
-                            child: const Icon(Icons.my_location,
-                                color: Colors.green, size: 20),
+                            // child: const Icon(Icons.my_location,
+                            //     color: Colors.green, size: 20),
                           ),
                         ),
                     ],
@@ -360,12 +388,13 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {
                       // Handle Choose Destination
                       // Navigator.pop(context,{'sourceLocation': _pSourceLocation});
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SearchPage(_pSourceLocation),
-                        ),
-                      );
+                      if(_pSourceLocation != null)
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SearchPage(_pSourceLocation, _pSourceLocation),
+                          ),
+                        );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.black,

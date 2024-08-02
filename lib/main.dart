@@ -37,6 +37,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   static LatLng _pSource = LatLng(12.9692, 79.1559);
+  String distance = ' ';
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,9 +48,9 @@ class MyApp extends StatelessWidget {
       initialRoute: '/homepage',
       routes: {
         '/': (context) => LoginPage(),
-        '/ride': (context) => MapRidePricePage(),
+        '/ride': (context) => MapRidePricePage(_pSource, _pSource, distance),
         '/homepage': (context) => HomePage(),
-        '/searchpage': (context) => SearchPage(_pSource),
+        '/searchpage': (context) => SearchPage(_pSource,_pSource),
         '/ridecompletion': (context) => RideCompletion(),
         '/Auto_details': (context) => BookingPage(),
         '/userdetails': (context) => user_details.UserDetailsPage(),
@@ -60,12 +61,12 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignupPage(),
         '/bidding': (context) => DriverListPage(),
         '/profilecompletion': (context) => ProfilePage(),
-        '/accountcreation': (context) => AccountCreatedPage(),
+        '/accountcreation': (context) => AccountCreatedPage(), 
         '/destination': (context) => DestinationPage(),
         '/rideconfirmation': (context) => RideConfirmationPage(),
         '/userbidpage': (context) => UserBidPage(),
         '/samplemap': (context) => SampleMaps(),
-        '/homepage-sample': (context) => HomepageSample(),
+        // '/homepage-sample': (context) => HomepageSample(),
         '/searchpage-sample': (context) => SearchPageSample(),
       },
     );

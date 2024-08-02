@@ -19,7 +19,8 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 class SearchPage extends StatefulWidget {
   LatLng? _pSourceLocation;
-  SearchPage(this._pSourceLocation);
+  LatLng? _pLocation;
+  SearchPage(this._pSourceLocation, this._pLocation);
   @override
   State<SearchPage> createState() => _SearchPageState();
 }
@@ -32,8 +33,6 @@ class _SearchPageState extends State<SearchPage> {
   final Completer<GoogleMapController> _mapController =
       Completer<GoogleMapController>();
   LatLng? _pCurrentLocation;
-  // LatLng? widget._pSourceLocation;
-  // const SearchPage({Key? key, this.widget._pSourceLocation}) : super(key: key);
   LatLng? _pDestinationLocation;
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylinesCoordinates = [];
@@ -96,7 +95,7 @@ class _SearchPageState extends State<SearchPage> {
       resizeToAvoidBottomInset: true,
       body: Stack(
         children: [
-          _pCurrentLocation == null
+          (widget._pLocation == null)
               ? Center(
                   child: Image.asset(
                     'assets/icons/loading_animation.gif',
@@ -110,7 +109,7 @@ class _SearchPageState extends State<SearchPage> {
                   }),
                   mapType: MapType.normal,
                   initialCameraPosition:
-                      CameraPosition(target: _pCurrentLocation!, zoom: 13),
+                      CameraPosition(target: widget._pLocation!, zoom: 13),
                   markers: {
                     if (widget._pSourceLocation != null)
                       Marker(
@@ -354,7 +353,7 @@ class _SearchPageState extends State<SearchPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MapRidePricePage(),
+                                  builder: (context) => MapRidePricePage(widget._pLocation, _pDestinationLocation, distance),
                                 ),
                               );
                             },
