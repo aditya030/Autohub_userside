@@ -45,9 +45,12 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
       initialRoute: '/homepage',
-      routes: {
-        '/': (context) => LoginPage(),
-        '/ride': (context) => MapRidePricePage(),
+        routes: {
+          '/': (context) => LoginPage(),
+          '/ride': (context) {
+            final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+            return MapRidePricePage(distance: args['distance']);
+          },
         '/homepage': (context) => HomePage(),
         '/searchpage': (context) => SearchPage(_pSource),
         '/ridecompletion': (context) => RideCompletion(),

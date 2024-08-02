@@ -347,7 +347,7 @@ class _DestinationPageSampleState extends State<DestinationPageSample> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MapRidePricePage(),
+                                  builder: (context) => MapRidePricePage(distance:distance),
                                 ),
                               );
                             },

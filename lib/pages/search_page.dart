@@ -354,7 +354,7 @@ class _SearchPageState extends State<SearchPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MapRidePricePage(),
+                                  builder: (context) => MapRidePricePage(distance:distance),
                                 ),
                               );
                             },
