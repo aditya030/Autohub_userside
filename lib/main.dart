@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignupPage(),
         '/bidding': (context) => DriverListPage(),
         '/profilecompletion': (context) => ProfilePage(),
-        '/accountcreation': (context) => AccountCreatedPage(), 
+        '/accountcreation': (context) => AccountCreatedPage(),
         '/destination': (context) => DestinationPage(),
         '/rideconfirmation': (context) => RideConfirmationPage(),
         '/userbidpage': (context) => UserBidPage(),
