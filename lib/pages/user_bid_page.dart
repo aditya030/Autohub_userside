@@ -17,7 +17,8 @@ class _UserBidPageState extends State<UserBidPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     double price = args['price'];
     minPrice = price;
     maxPrice = price! + 100;
@@ -141,17 +142,20 @@ class _UserBidPageState extends State<UserBidPage> {
                       height: 55,
                       child: ElevatedButton(
                         onPressed: () {
-                          final enteredPrice = double.tryParse(_priceController.text) ?? 0;
+                          final enteredPrice =
+                              double.tryParse(_priceController.text) ?? 0;
                           if (enteredPrice < (minPrice ?? 0)) {
                             setState(() {
-                              errorMessage = 'Error: The offer price is below the minimum price.';
+                              errorMessage =
+                                  'Error: The offer price is below the minimum price.';
                             });
                           } else {
                             setState(() {
                               errorMessage = null;
                             });
                             // Implement booking logic
-                            Navigator.of(context).pushReplacementNamed("/bidding");
+                            Navigator.of(context)
+                                .pushReplacementNamed("/bidding");
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -177,3 +181,6 @@ class _UserBidPageState extends State<UserBidPage> {
           ),
         ],
       ),
+    );
+  }
+}
