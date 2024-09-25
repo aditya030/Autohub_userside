@@ -19,7 +19,7 @@ class MapRidePricePage extends StatefulWidget {
 class _MapRidePricePageState extends State<MapRidePricePage> {
   bool isPremiumSelected = true;
   final Completer<GoogleMapController> _mapController =
-      Completer<GoogleMapController>();
+  Completer<GoogleMapController>();
   LatLng? _pCurrentLocation;
   LatLng? _pDestinationLocation;
   Map<PolylineId, Polyline> polylines = {};
@@ -57,36 +57,36 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
       body: Stack(
         children: [
           (widget._pSourceLocation == null && widget._pDestinationLocation == null)
-            ? Center(
-                  child: Image.asset(
-                    'assets/icons/loading_animation.gif',
-                    width: screenHeight * 0.3,
-                  ),
-                )
+              ? Center(
+            child: Image.asset(
+              'assets/icons/loading_animation.gif',
+              width: screenHeight * 0.3,
+            ),
+          )
               : GoogleMap(
-                  onMapCreated: ((GoogleMapController controller) {
-                    _mapController.complete(controller);
-                    mapController = controller;
-                  }),
-                  mapType: MapType.normal,
-                  initialCameraPosition:
-                      CameraPosition(target: widget._pSourceLocation!, zoom: 13),
-                  markers: {
-                    if (widget._pSourceLocation != null)
-                      Marker(
-                        markerId: MarkerId("_sourceLocation"),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
-                        position: widget._pSourceLocation!,
-                      ),
-                    if (_pDestinationLocation != null)
-                      Marker(
-                        markerId: MarkerId("_destinationLocation"),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
-                        position: _pDestinationLocation!,
-                      ),
-                  },
-                  polylines: Set<Polyline>.of(polylines.values),
-                ), 
+            onMapCreated: ((GoogleMapController controller) {
+              _mapController.complete(controller);
+              mapController = controller;
+            }),
+            mapType: MapType.normal,
+            initialCameraPosition:
+            CameraPosition(target: widget._pSourceLocation!, zoom: 13),
+            markers: {
+              if (widget._pSourceLocation != null)
+                Marker(
+                  markerId: MarkerId("_sourceLocation"),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                  position: widget._pSourceLocation!,
+                ),
+              if (_pDestinationLocation != null)
+                Marker(
+                  markerId: MarkerId("_destinationLocation"),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                  position: _pDestinationLocation!,
+                ),
+            },
+            polylines: Set<Polyline>.of(polylines.values),
+          ),
 
           Positioned(
             top: 50.0,
@@ -285,7 +285,15 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
                     child: ElevatedButton(
                       onPressed: () {
                         print("Button Clicked");
-                        Navigator.pushNamed(context, '/userbidpage');
+                        Navigator.pushNamed(
+                          context,
+                          '/userbidpage',
+                          arguments: {
+                            'price': isPremiumSelected ? premiumPrice : autoPrice,
+                            'type': isPremiumSelected ? 'Premium Auto' : 'Auto',
+                          },
+                        );
+
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -350,7 +358,7 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
     _locationPermissionGranted = await _locationController.hasPermission();
     if (_locationPermissionGranted == PermissionStatus.denied) {
       _locationPermissionGranted =
-          await _locationController.requestPermission();
+      await _locationController.requestPermission();
       if (_locationPermissionGranted != PermissionStatus.granted) {
         return;
       }
