@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:autohub_app/components/const.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+// import 'package:flutter_map/flutter_map.dart';
 import 'package:autohub_app/styles/app_colors.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 class BookingPage extends StatefulWidget {
   const BookingPage({Key? key}) : super(key: key);
@@ -11,6 +16,19 @@ class BookingPage extends StatefulWidget {
 }
 
 class _BookingPageState extends State<BookingPage> {
+  final Completer<GoogleMapController> _mapController =
+      Completer<GoogleMapController>();
+  LatLng? _pCurrentLocation;
+  LatLng? _pSourceLocation;
+  LatLng? _pDestinationLocation;
+  late GoogleMapController mapController;
+  Location _locationController = Location();
+
+  @override
+  void initState() {
+    super.initState();
+    getLocationUpdates();
+  }
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -20,35 +38,43 @@ class _BookingPageState extends State<BookingPage> {
       backgroundColor: AppColors.backgroundColor,
       body: Stack(
         children: [
-          FlutterMap(
-            options: MapOptions(
-              initialCenter: LatLng(
-                12.9692,
-                79.1559,
-              ),
-              initialZoom: 15,
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'dev.vit.vellore',
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: LatLng(
-                      12.9692,
-                      79.1559,
-                    ),
-                    child: Icon(
-                      Icons.location_on,
-                      color: Colors.green,
-                    ),
+          _pCurrentLocation == null
+              ? Center(
+                  child: Image.asset(
+                    'assets/icons/loading_animation.gif',
+                    width: screenHeight * 0.3,
                   ),
-                ],
-              ),
-            ],
-          ),
+                )
+              : GoogleMap(
+                  onMapCreated: ((GoogleMapController controller) {
+                    _mapController.complete(controller);
+                    mapController = controller;
+                  }),
+                  mapType: MapType.normal,
+                  initialCameraPosition:
+                      CameraPosition(target: _pCurrentLocation!, zoom: 13),
+                  markers: {
+                    if(_pCurrentLocation != null)
+                      Marker(
+                        markerId: MarkerId("_pCurrentLocation"),
+                        icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                        position: _pCurrentLocation!,
+                      ),
+                    // if (_pSourceLocation != null)
+                    //   Marker(
+                    //     markerId: MarkerId("_sourceLocation"),
+                    //     icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                    //     position: _pSourceLocation!,
+                    //   ),
+                    // if (_pDestinationLocation != null)
+                    //   Marker(
+                    //     markerId: MarkerId("_destinationLocation"),
+                    //     icon: BitmapDescriptor.defaultMarkerWithHue(90),
+                    //     position: _pDestinationLocation!,
+                    //   ),
+                  },
+                  // polylines: Set<Polyline>.of(polylines.values),
+                ),
           Positioned(
             top: 50.0,
             right: 15.0,
@@ -288,5 +314,40 @@ class _BookingPageState extends State<BookingPage> {
         ],
       ),
     );
+  }
+
+  Future<void> getLocationUpdates() async {
+    bool _serviceEnabled;
+    PermissionStatus _locationPermissionGranted;
+
+    // If Location is disabled send a prompt saying to turn on the location.
+    _serviceEnabled = await _locationController.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await _locationController.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _locationPermissionGranted = await _locationController.hasPermission();
+    if (_locationPermissionGranted == PermissionStatus.denied) {
+      _locationPermissionGranted =
+          await _locationController.requestPermission();
+      if (_locationPermissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    _locationController.onLocationChanged
+        .listen((LocationData currentLocation) {
+      if (currentLocation.latitude != null &&
+          currentLocation.longitude != null) {
+        setState(() {
+          _pCurrentLocation =
+              LatLng(currentLocation.latitude!, currentLocation.longitude!);
+          print("Current Position: $currentLocation");
+        });
+      }
+    });
   }
 }

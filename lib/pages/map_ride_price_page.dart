@@ -11,9 +11,6 @@ class MapRidePricePage extends StatefulWidget {
   LatLng? _pDestinationLocation;
   String distance;
   MapRidePricePage(this._pSourceLocation, this._pDestinationLocation, this.distance);
-  // MapRidePricePage(this.distance);
-  // final String distance;
-  // const MapRidePricePage({Key? key, required this.distance}) : super(key: key);
 
   @override
   State<MapRidePricePage> createState() => _MapRidePricePageState();
@@ -42,8 +39,10 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
 
   void calculatePrices() {
     setState(() {
-      autoPrice = distanceInKm * 10.0; // Rate for Auto
-      premiumPrice = distanceInKm * 12.0; // Rate for Premium Auto
+      autoPrice = distanceInKm * 10; // Rate for Auto
+      premiumPrice = (distanceInKm * 12); // Rate for Premium Auto
+      int _premiumPrice = premiumPrice.ceil();
+      int _autoPrice = autoPrice.ceil();
     });
   }
 
