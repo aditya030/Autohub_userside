@@ -45,9 +45,9 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/Auto_details',
+      initialRoute: '/   ',
       routes: {
-        '/': (context) => LoginPage(),
+        '/': (context) => HomePage(),
         '/ride': (context) => MapRidePricePage(_pSource, _pSource, distance),
         // routes: {
         //   '/': (context) => LoginPage(),
