@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class DriverListPage extends StatefulWidget {
-  const DriverListPage({Key? key}) : super(key: key);
+  final int bidPrice; // Add bidPrice as a parameter
+
+  const DriverListPage({Key? key, required this.bidPrice}) : super(key: key);
 
   @override
   _DriverListPageState createState() => _DriverListPageState();
@@ -109,7 +111,7 @@ class _DriverListPageState extends State<DriverListPage> {
                           ),
                         ),
                         Text(
-                          '₹400',
+                          '₹${widget.bidPrice}', // Use bidPrice from the widget
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

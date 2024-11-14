@@ -21,7 +21,7 @@ class _UserBidPageState extends State<UserBidPage> {
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     double price = args['price'];
     minPrice = price;
-    maxPrice = price! + 100;
+    maxPrice = price + 100;
   }
 
   @override
@@ -121,7 +121,7 @@ class _UserBidPageState extends State<UserBidPage> {
                           children: [
                             Flexible(
                               child: Text(
-                                "Mini Price: Rs ${minPrice?.toStringAsFixed(2) ?? '0'}",
+                                "Min Price: Rs ${minPrice?.toStringAsFixed(2) ?? '0'}",
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -148,6 +148,11 @@ class _UserBidPageState extends State<UserBidPage> {
                             setState(() {
                               errorMessage =
                                   'Error: The offer price is below the minimum price.';
+                            });
+                          } else if (enteredPrice > (maxPrice ?? 0)) {
+                            setState(() {
+                              errorMessage =
+                                  'Error: The offer price exceeds the maximum price.';
                             });
                           } else {
                             setState(() {

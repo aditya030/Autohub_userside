@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
         fontFamily: "Lexend",
         scaffoldBackgroundColor: AppColors.backgroundColor,
       ),
-      initialRoute: '/   ',
+      initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),
         '/ride': (context) => MapRidePricePage(_pSource, _pSource, distance),
@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
         //     return MapRidePricePage(distance: args['distance']);
         //   },
         '/homepage': (context) => HomePage(),
-        '/searchpage': (context) => SearchPage(_pSource,_pSource),
+        '/searchpage': (context) => SearchPage(_pSource, _pSource),
         '/ridecompletion': (context) => RideCompletion(),
         '/Auto_details': (context) => BookingPage(),
         '/userdetails': (context) => user_details.UserDetailsPage(),
@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
         '/signin': (context) => SigninPage(),
         '/otp': (context) => OTPPage(),
         '/signup': (context) => SignupPage(),
-        '/bidding': (context) => DriverListPage(),
+        '/bidding': (context) => DriverListPage(bidPrice: 1700),
         '/profilecompletion': (context) => ProfilePage(),
         '/accountcreation': (context) => AccountCreatedPage(),
         '/destination': (context) => DestinationPage(),

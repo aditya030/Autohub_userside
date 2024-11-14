@@ -88,54 +88,54 @@ class _MapRidePricePageState extends State<MapRidePricePage> {
             polylines: Set<Polyline>.of(polylines.values),
           ),
 
-          Positioned(
-            top: 50.0,
-            left: 15.0,
-            child: Container(
-              width: screenWidth * 0.9,
-              height: 100.0,
-              decoration: BoxDecoration(
-                color: AppColors.backgroundColor.withOpacity(0.9),
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                border: Border.all(color: AppColors.primaryColor),
-              ),
-              child: Column(
-                children: [
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: "Vit Main Gate",
-                      hintStyle: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.circle,
-                        color: Colors.green,
-                        size: 15,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  Divider(height: 0.0, color: Colors.black),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: "CMC Ranipet Campus",
-                      hintStyle: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search_outlined,
-                        color: Colors.grey,
-                        size: 20,
-                      ),
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          // Positioned(
+          //   top: 50.0,
+          //   left: 15.0,
+          //   child: Container(
+          //     width: screenWidth * 0.9,
+          //     height: 100.0,
+          //     decoration: BoxDecoration(
+          //       color: AppColors.backgroundColor.withOpacity(0.9),
+          //       borderRadius: BorderRadius.all(Radius.circular(5)),
+          //       border: Border.all(color: AppColors.primaryColor),
+          //     ),
+          //     child: Column(
+          //       children: [
+          //         TextField(
+          //           decoration: InputDecoration(
+          //             hintText: "Vit Main Gate",
+          //             hintStyle: TextStyle(
+          //               fontSize: 19,
+          //               fontWeight: FontWeight.w400,
+          //             ),
+          //             prefixIcon: Icon(
+          //               Icons.circle,
+          //               color: Colors.green,
+          //               size: 15,
+          //             ),
+          //             border: InputBorder.none,
+          //           ),
+          //         ),
+          //         Divider(height: 0.0, color: Colors.black),
+          //         TextField(
+          //           decoration: InputDecoration(
+          //             hintText: "CMC Ranipet Campus",
+          //             hintStyle: TextStyle(
+          //               fontSize: 19,
+          //               fontWeight: FontWeight.w400,
+          //             ),
+          //             prefixIcon: Icon(
+          //               Icons.search_outlined,
+          //               color: Colors.grey,
+          //               size: 20,
+          //             ),
+          //             border: InputBorder.none,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
